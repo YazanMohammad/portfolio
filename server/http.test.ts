@@ -120,3 +120,11 @@ it("https://localhost is not local http", () => {
     expect(isLocalHttp(), origin).toBe(false);
   }
 });
+it("readJson returns too_large (413) above the cap, not a JSON error", async () => {
+  await expect(readJson(request(JSON.stringify({ name: "x".repeat(65537) })), schema)).rejects.toMatchObject({ code: "too_large", status: 413, message: "Request is too large." });
+});
+it("readJson cap counts UTF-8 bytes and accepts a larger per-route cap", async () => {
+  const body = JSON.stringify({ name: "€".repeat(30000) }); // 90 KB in bytes, 30k chars
+  await expect(readJson(request(body), schema)).rejects.toMatchObject({ code: "too_large" });
+  expect((await readJson(request(body), schema, 128 * 1024)).name).toHaveLength(30000);
+});

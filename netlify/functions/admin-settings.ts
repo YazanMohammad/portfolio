@@ -7,7 +7,7 @@ import { siteSettings } from "../../db/schema";
 import { CopyOverrides, ThemeOverrides, SettingsInput, themeDefaults } from "../../shared/settings";
 import { siteCopy } from "../../src/content/copy";
 import { adminHandler } from "../../server/handlers";
-import { fail, json, notFound, readJson } from "../../server/http";
+import { SETTINGS_BODY_BYTES, fail, json, notFound, readJson } from "../../server/http";
 import { touchLastSaved } from "../../server/last-saved";
 import { purgeContent } from "../../server/cache";
 import { zodFields } from "../../server/zod-fields";
@@ -15,7 +15,7 @@ import { zodFields } from "../../server/zod-fields";
 const Input = z.object({copy: CopyOverrides.optional(), theme: ThemeOverrides.optional()}).strict();
 export default adminHandler(async req => {
   if (new URL(req.url).pathname !== "/api/admin/settings" || !["GET", "PUT"].includes(req.method)) throw notFound();
-  const input = req.method === "PUT" ? await readJson(req, Input) : null;
+  const input = req.method === "PUT" ? await readJson(req, Input, SETTINGS_BODY_BYTES) : null;
   const old = await db.query.siteSettings.findFirst({where: eq(siteSettings.id, 1)});
   const response = (copy: unknown, theme: unknown, updatedAt: Date | null) => json({copy, theme, updatedAt: updatedAt?.toISOString() ?? null, defaults: {copy: siteCopy, theme: themeDefaults}});
   const clean = sanitizeOverrides(old);

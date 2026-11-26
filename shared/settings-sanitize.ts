@@ -10,7 +10,7 @@ export function sanitizeOverrides(input: unknown): {copy: DeepPartial<SiteCopy>;
       if (!Object.hasOwn(row, key)) continue;
       const candidate = row[key];
       if (typeof fallback === "string") {
-        if (typeof candidate === "string" && candidate.trim() && candidate.trim().length <= (longCopyKeys.has(key) ? 1000 : 300)) result[key] = candidate.trim();
+        if (typeof candidate === "string" && candidate.trim() && candidate.trim().length <= (longCopyKeys.has(key) ? 1000 : 300) && candidate.trim() !== fallback) result[key] = candidate.trim();
       } else {
         const child = copy(fallback as Record<string, unknown>, candidate);
         if (Object.keys(child).length) result[key] = child;

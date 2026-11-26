@@ -156,3 +156,15 @@ for (const c of cases) describe(c.name, () => {
   expect(m.touch).not.toHaveBeenCalled(); expect(res.headers.get("Set-Cookie")).toBe("session=renewed");
  });
 });
+it("accepts a maximum-length multibyte project body (> 64 KiB) on POST", async () => {
+ const u = "https://example.com/" + "a".repeat(2000);
+ const full = { ...fixtures.projects, slug: "a".repeat(80), title: "€".repeat(100), summary: "€".repeat(200), body: "€".repeat(20000), role: "€".repeat(200), category: "€".repeat(50), technologies: Array(20).fill("€".repeat(40)), liveUrl: u, githubUrl: u, imageKey: null, imageAlt: "€".repeat(200) };
+ const raw = JSON.stringify(full); expect(new TextEncoder().encode(raw).byteLength).toBeGreaterThan(65536);
+ m.where.mockResolvedValue([]); m.returning.mockResolvedValueOnce([{ ...cases[0].row, id: 3 }]);
+ const response = await handler(new Request("https://site.test/api/admin/projects", { method: "POST", headers: { Origin: "https://site.test" }, body: raw }), ctx);
+ expect(response.status).not.toBe(413); expect(response.status).not.toBe(400);
+});
+it("POST above the cap returns 413", async () => {
+ const response = await handler(req("POST", "/api/admin/projects", { ...fixtures.projects, body: "x".repeat(140000) }), ctx);
+ expect(response.status).toBe(413);
+});

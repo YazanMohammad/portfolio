@@ -41,11 +41,19 @@ export function noContent(headers?: HeadersInit): Response {
   return new Response(null, { status: 204, headers: responseHeaders(headers) });
 }
 
-export async function readJson<S extends ZodTypeAny>(req: Request, schema: S): Promise<z.infer<S>> {
+// Default JSON body cap. Routes with larger legitimate bodies pass their own cap (4 bytes per
+// character worst case for UTF-8, plus overhead).
+export const DEFAULT_BODY_BYTES = 64 * 1024;
+// ProjectInput max: body 20000 + ~5.9k chars of other fields (two 2048-char URLs included) ~= 26k chars x 4 B ~= 104 KB.
+export const COLLECTION_BODY_BYTES = 128 * 1024;
+// Settings: ~85 copy leaves x 300 chars (7 x 1000) ~= 30k chars x 4 B ~= 120 KB plus keys.
+export const SETTINGS_BODY_BYTES = 160 * 1024;
+
+export async function readJson<S extends ZodTypeAny>(req: Request, schema: S, maxBytes = DEFAULT_BODY_BYTES): Promise<z.infer<S>> {
+  const text = await req.text();
+  if (new TextEncoder().encode(text).byteLength > maxBytes) throw fail("too_large", "Request is too large.");
   let data: unknown;
   try {
-    const text = await req.text();
-    if (new TextEncoder().encode(text).byteLength > 65536) throw new Error("Request too large");
     data = JSON.parse(text);
   } catch {
     throw fail("validation", "Invalid JSON.", { fields: { "": "Send a JSON object." } });

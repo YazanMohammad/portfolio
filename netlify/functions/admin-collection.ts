@@ -5,7 +5,7 @@ import { db } from "../../db/client";
 import { projects, experience, education, skills } from "../../db/schema";
 import { ProjectInput, ExperienceInput, EducationInput, SkillInput, ReorderInput } from "../../shared/index";
 import { adminHandler } from "../../server/handlers";
-import { fail, json, noContent, notFound, readJson } from "../../server/http";
+import { COLLECTION_BODY_BYTES, fail, json, noContent, notFound, readJson } from "../../server/http";
 import { projectToRow, experienceToRow, educationToRow, skillToRow, toProject, toExperience, toEducation, toSkill } from "../../server/mappers";
 
 import { touchLastSaved } from "../../server/last-saved";
@@ -48,7 +48,7 @@ export default adminHandler(async req => {
     return json(rows.map(row => settings.fromRow(row)));
   }
   if (!match[2] && req.method === "POST") {
-    const input = await readJson(req, settings.schema);
+    const input = await readJson(req, settings.schema, COLLECTION_BODY_BYTES);
     const rows = await db.select().from(table).orderBy(asc(table.sortOrder), asc(table.id));
     const sortOrder = Math.max(-1, ...rows.map(row => row.sortOrder)) + 1;
     const [saved] = await guardSlug(match[1] === "projects", async () => {
@@ -74,7 +74,7 @@ export default adminHandler(async req => {
   if (match[2] && match[2] !== "order" && req.method === "PUT") {
     const id = Number(match[2]);
     if (!Number.isSafeInteger(id) || id > 2147483647) throw notFound();
-    const input = await readJson(req, settings.schema);
+    const input = await readJson(req, settings.schema, COLLECTION_BODY_BYTES);
     const [old] = await db.select().from(table).where(eq(table.id, id));
     if (!old) throw notFound();
     const saved = settings.toRow(input);
