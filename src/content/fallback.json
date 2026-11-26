@@ -1,0 +1,348 @@
+{
+  "profile": {
+    "name": "Yazan Mohammad",
+    "headline": "AI Engineer",
+    "intro": "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs.",
+    "about": "I write TypeScript, Python and C#. My web projects use React, ASP.NET Core and MS SQL Server.\u000a\u000aAt Xocialive, I worked as a software engineering intern. I built and maintained web apps, worked on the backend and database queries, and helped the team with UI changes.\u000a\u000aI studied computer science at Zarqa University. I'm open to full-time roles and freelance work.",
+    "location": "Jordan",
+    "email": "ybmoh03@gmail.com",
+    "githubUrl": "https://github.com/YazanMohammad",
+    "linkedinUrl": null,
+    "available": true,
+    "availabilityText": null,
+    "photoAlt": null,
+    "photoUrl": null,
+    "cvUrl": null,
+    "updatedAt": "2026-11-25T00:00:00.000Z"
+  },
+  "projects": [
+    {
+      "id": 1,
+      "slug": "portfolio-v1",
+      "title": "Portfolio V1",
+      "summary": "Personal portfolio built with Next.js 16, TypeScript and Tailwind CSS, with a custom admin dashboard backed by PostgreSQL via Supabase.",
+      "role": null,
+      "category": "Full Stack",
+      "technologies": [
+        "Next.js 16",
+        "TypeScript",
+        "Tailwind CSS",
+        "Prisma",
+        "PostgreSQL",
+        "Supabase"
+      ],
+      "liveUrl": "https://www.yznmoh.com/",
+      "githubUrl": "https://github.com/YazanMohammad/portfolio",
+      "imageKey": null,
+      "imageAlt": null,
+      "featured": true,
+      "sortOrder": 1
+    },
+    {
+      "id": 2,
+      "slug": "chat-app",
+      "title": "Chat App",
+      "summary": "A real-time chat app. React frontend, ASP.NET Core backend, SignalR for live messages.",
+      "role": null,
+      "category": "Full Stack",
+      "technologies": [
+        "React.JS",
+        "ASP.NET Core",
+        "SignalR",
+        "C#"
+      ],
+      "liveUrl": "https://chat-app-by-me.vercel.app/",
+      "githubUrl": "https://github.com/YazanMohammad/ChatApp",
+      "imageKey": null,
+      "imageAlt": null,
+      "featured": true,
+      "sortOrder": 2
+    },
+    {
+      "id": 3,
+      "slug": "tic-tac-toe",
+      "title": "Tic-Tac-Toe",
+      "summary": "A Tic-Tac-Toe game in React. It detects wins and draws and works on phones.",
+      "role": null,
+      "category": "Web Development",
+      "technologies": [
+        "React.JS"
+      ],
+      "liveUrl": null,
+      "githubUrl": null,
+      "imageKey": null,
+      "imageAlt": null,
+      "featured": false,
+      "sortOrder": 3
+    }
+  ],
+  "experience": [
+    {
+      "id": 1,
+      "position": "AI Engineer",
+      "company": null,
+      "location": null,
+      "startDate": null,
+      "endDate": null,
+      "current": true,
+      "bullets": [],
+      "sortOrder": 1
+    },
+    {
+      "id": 2,
+      "position": "Software Engineering Intern",
+      "company": "Xocialive",
+      "location": "Jordan",
+      "startDate": "2024-09",
+      "endDate": "2025-01",
+      "current": false,
+      "bullets": [
+        "Developed and maintained web applications using React.JS, ASP.NET Core, and MS SQL Server.",
+        "Worked on the backend and made slow database queries faster.",
+        "Worked with the team on UI changes."
+      ],
+      "sortOrder": 2
+    }
+  ],
+  "education": [
+    {
+      "id": 1,
+      "degree": "B.S. Computer Science",
+      "school": "Zarqa University",
+      "location": "Zarqa, Jordan",
+      "startDate": "2021-01",
+      "endDate": "2024-01",
+      "description": "GPA 76.1%",
+      "sortOrder": 1
+    }
+  ],
+  "skills": [
+    {
+      "id": 1,
+      "name": "TypeScript",
+      "category": "Languages",
+      "iconSlug": "typescript",
+      "sortOrder": 1
+    },
+    {
+      "id": 2,
+      "name": "JavaScript",
+      "category": "Languages",
+      "iconSlug": "javascript",
+      "sortOrder": 2
+    },
+    {
+      "id": 3,
+      "name": "Python",
+      "category": "Languages",
+      "iconSlug": "python",
+      "sortOrder": 3
+    },
+    {
+      "id": 4,
+      "name": "Java",
+      "category": "Languages",
+      "iconSlug": "java",
+      "sortOrder": 4
+    },
+    {
+      "id": 5,
+      "name": "C#",
+      "category": "Languages",
+      "iconSlug": "csharp",
+      "sortOrder": 5
+    },
+    {
+      "id": 6,
+      "name": "C++",
+      "category": "Languages",
+      "iconSlug": "cplusplus",
+      "sortOrder": 6
+    },
+    {
+      "id": 7,
+      "name": "C",
+      "category": "Languages",
+      "iconSlug": null,
+      "sortOrder": 7
+    },
+    {
+      "id": 8,
+      "name": "PHP",
+      "category": "Languages",
+      "iconSlug": "php",
+      "sortOrder": 8
+    },
+    {
+      "id": 9,
+      "name": "SQL",
+      "category": "Languages",
+      "iconSlug": null,
+      "sortOrder": 9
+    },
+    {
+      "id": 10,
+      "name": "React",
+      "category": "Frameworks",
+      "iconSlug": "react",
+      "sortOrder": 10
+    },
+    {
+      "id": 11,
+      "name": "ASP.NET Core",
+      "category": "Frameworks",
+      "iconSlug": "dotnet",
+      "sortOrder": 11
+    },
+    {
+      "id": 12,
+      "name": "Git",
+      "category": "Tools",
+      "iconSlug": "git",
+      "sortOrder": 12
+    },
+    {
+      "id": 13,
+      "name": "EF Core",
+      "category": "Tools",
+      "iconSlug": null,
+      "sortOrder": 13
+    },
+    {
+      "id": 14,
+      "name": "LLMs",
+      "category": "Technologies",
+      "iconSlug": null,
+      "sortOrder": 14
+    }
+  ],
+  "settings": {
+    "copy": {
+      "loading": "Loading…",
+      "skipLink": "Skip to content",
+      "menuLabel": "Menu",
+      "menuOpen": "Index +",
+      "menuClose": "Close −",
+      "meta": {
+        "title": "Yazan Mohammad: AI Engineer",
+        "description": "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs."
+      },
+      "dates": {
+        "since": "Since",
+        "until": "Until",
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+      },
+      "mainNavLabel": "Main",
+      "nav": {
+        "work": "Work",
+        "experience": "Experience",
+        "skills": "Skills",
+        "about": "About",
+        "contact": "Contact"
+      },
+      "hero": {
+        "contentsLabel": "Project contents",
+        "primary": "See my work",
+        "secondary": "Download CV",
+        "emailLabel": "Email me",
+        "stageTitle": "Projects"
+      },
+      "work": {
+        "sectionLabel": "[01] Work",
+        "heading": "Selected work",
+        "moreHeading": "More projects",
+        "viewProject": "See the project",
+        "viewCode": "See the code",
+        "viewLive": "See it live"
+      },
+      "timeline": {
+        "sectionLabel": "[02] Experience",
+        "heading": "Experience and education",
+        "experience": "Experience",
+        "education": "Education",
+        "now": "Now"
+      },
+      "skills": {
+        "heading": "Skills",
+        "sectionLabel": "[03] Skills"
+      },
+      "about": {
+        "heading": "About",
+        "sectionLabel": "[04] About"
+      },
+      "contact": {
+        "sectionLabel": "[05] Contact",
+        "website": "Website",
+        "invalidField": "Check this field.",
+        "errors": {
+          "name": "Write your name",
+          "email": "Write an email address with an @",
+          "subject": "Use a shorter subject",
+          "message": "Write a message"
+        },
+        "invalidForm": "Check the fields and try again.",
+        "heading": "Write to me",
+        "lead": "I'm open to full-time roles and freelance projects.",
+        "labels": {
+          "name": "Name",
+          "email": "Email",
+          "subject": "Subject",
+          "message": "Message"
+        },
+        "submit": "Send message",
+        "sending": "Sending message",
+        "sent": "Your message is sent. I will read it and reply by email.",
+        "networkError": "The message did not send. Check your connection and try again.",
+        "rateLimited": "Too many messages from this connection. Try again in a few minutes.",
+        "emailPrefix": "Or email"
+      },
+      "project": {
+        "back": "See all work",
+        "stack": "Stack",
+        "role": "Role",
+        "links": "Links",
+        "notFound": {
+          "heading": "Project not found",
+          "line": "I couldn't find that project. You can find my work below.",
+          "action": "See all work"
+        },
+        "loadError": "The project did not load. Reload the page to try again."
+      },
+      "notFound": {
+        "heading": "Page not found",
+        "line": "There's nothing at this address. My work is on the home page.",
+        "action": "See my work"
+      },
+      "footer": {
+        "rights": "Yazan Mohammad. All rights reserved.",
+        "sections": "On this page",
+        "elsewhere": "Elsewhere",
+        "github": "GitHub",
+        "linkedin": "LinkedIn",
+        "email": "Email"
+      }
+    },
+    "theme": {
+      "hue": 73,
+      "grid": true,
+      "sphere": true,
+      "sectionShapes": true,
+      "marquee": true,
+      "cursorPreview": true,
+      "nameReveal": true,
+      "heroShape": "sphere",
+      "highlightWord": "Jordan"
+    }
+  }
+}

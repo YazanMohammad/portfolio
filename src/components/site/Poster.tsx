@@ -1,0 +1,13 @@
+import { useEffect, useState } from "react";
+
+export function useMedia(query: string) {
+  const [matches, setMatches] = useState(() => typeof matchMedia !== "undefined" && matchMedia(query).matches);
+  useEffect(() => {
+    if (typeof matchMedia === "undefined") return;
+    const media = matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update(); media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [query]);
+  return matches;
+}
