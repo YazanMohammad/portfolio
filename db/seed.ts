@@ -5,16 +5,17 @@ import { db } from "./client";
 import { loadRootEnv } from "./load-env";
 import { education, experience, profile, projects, siteState, siteSettings, skills } from "./schema";
 import {
-  CV_SOURCE_URL, PREVIEW_FILES, seedEducation, seedExperience, seedProfile, seedProjects, seedSkills,
+  PREVIEW_FILES, seedEducation, seedExperience, seedProfile, seedProjects, seedSkills,
 } from "./seed-data";
 import {
-  CV_MAX_BYTES, EducationInput, ExperienceInput, ProfileInput, ProjectInput, SkillInput, type UploadResult,
+  EducationInput, ExperienceInput, ProfileInput, ProjectInput, SkillInput, type UploadResult,
 } from "../shared/index";
 import {
   educationToRow, experienceToRow, profileToRow, projectToRow, skillToRow,
 } from "../server/mappers";
 import { saveFile } from "../server/blobs";
 import { detectFileType } from "../server/uploads";
+import { loadCvBytes, type CvSourceOptions } from "./seed-cv";
 
 type UploadFile = (bytes: Uint8Array, ext: string, contentType: string) => Promise<UploadResult>;
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -42,15 +43,10 @@ async function storeImage(slug: string, upload: UploadFile): Promise<string | nu
   }
 }
 
-async function storeCv(fetchCv: typeof fetch, upload: UploadFile): Promise<string | null> {
+async function storeCv(source: CvSourceOptions, upload: UploadFile): Promise<string | null> {
   try {
-    const response = await fetchCv(CV_SOURCE_URL, { signal: AbortSignal.timeout(20_000) });
-    if (!response.ok) throw new Error(`download failed with status ${response.status}`);
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength > CV_MAX_BYTES) throw new Error("file is larger than 4 MB");
-    const type = detectFileType(bytes);
-    if (type?.contentType !== "application/pdf") throw new Error("the response is not a PDF");
-    return (await upload(bytes, type.ext, type.contentType)).key;
+    const bytes = await loadCvBytes(source);
+    return (await upload(bytes, "pdf", "application/pdf")).key;
   } catch (error) {
     console.warn(`Warning: CV not stored: ${message(error)}`);
     return null;
@@ -58,7 +54,7 @@ async function storeCv(fetchCv: typeof fetch, upload: UploadFile): Promise<strin
 }
 
 export async function runSeed(opts: {
-  force: boolean; fetchCv?: typeof fetch; uploadFile?: UploadFile;
+  force: boolean; fetchCv?: typeof fetch; uploadFile?: UploadFile; cvPath?: string | null; defaultCvPath?: string | null;
 }): Promise<{ skipped: boolean }> {
   if (!opts.force) {
     // Any content row (not only the profile) means the site has data a plain run must not touch.
@@ -73,7 +69,7 @@ export async function runSeed(opts: {
   // With the default uploader and no Blobs config nothing can be stored: say so once and skip the downloads.
   const noBlobs = !opts.uploadFile && blobsUnavailable();
   if (noBlobs) console.warn(`Warning: CV and images not stored. ${BLOBS_MESSAGE}`);
-  const cvKey = noBlobs ? null : await storeCv(opts.fetchCv ?? fetch, upload);
+  const cvKey = noBlobs ? null : await storeCv(opts, upload);
   const projectRows = [];
   for (const project of seedProjects) {
     const imageKey = noBlobs || !PREVIEW_FILES[project.slug] ? null : await storeImage(project.slug, upload);

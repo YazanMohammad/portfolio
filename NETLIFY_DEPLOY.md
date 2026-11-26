@@ -49,6 +49,10 @@ Run these on your own machine, not on Netlify. Put the values in the local `.env
    - `DATABASE_URL`: the main pooled URL.
    - `BLOBS_SITE_ID`: in Netlify, **Site configuration → Site details → Site ID**.
    - `BLOBS_TOKEN`: a personal access token. Create one in Netlify under **User settings → Applications → Personal access tokens**.
+   - `CV_PATH` (optional, local seed only): absolute path to the CV PDF. If unset, the seed uses
+     `C:/Projects/Personal/CV maker/master/Yazan_Mohammad_CV.pdf` when present, otherwise the legacy CV URL.
+     An explicit missing/invalid path does not fall back to an older CV. Both local and downloaded
+     files must have a PDF signature and be at most 4 MB. Keep the PDF outside the repo; do not commit it.
 3. If your shell exports a different `DATABASE_URL` than `.env`, run `env -u DATABASE_URL pnpm db:seed`. Otherwise run `pnpm db:seed`. Do not pass `--force`.
 4. When it finishes, delete `BLOBS_TOKEN` from `.env` and revoke the token in Netlify.
 

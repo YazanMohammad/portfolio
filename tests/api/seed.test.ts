@@ -1,5 +1,8 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { count, eq } from "drizzle-orm";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "../../db/client";
 import {
@@ -25,7 +28,7 @@ const uploadFile = vi.fn(async (bytes: Uint8Array, ext: string, contentType: str
   return { key, url: `/api/files/${key}`, contentType, size: bytes.byteLength };
 });
 const rows = async (table: PgTable) => (await db.select({ n: count() }).from(table))[0].n;
-const seedOptions = { fetchCv: okCv as unknown as typeof fetch, uploadFile };
+const seedOptions = { fetchCv: okCv as unknown as typeof fetch, uploadFile, cvPath: null, defaultCvPath: null };
 
 describeDb("seed script (real db)", () => {
   beforeEach(async () => {
@@ -57,6 +60,21 @@ describeDb("seed script (real db)", () => {
     const skillRows = await db.select().from(skills);
     expect(skillRows.find((s) => s.name === "LLM-response evaluation")!.iconSlug).toBeNull();
     expect(skillRows.find((s) => s.name === "SQL")!.iconSlug).toBeNull();
+  });
+
+  it("stores CV_PATH bytes and persists its PDF key without fetching the legacy URL", async () => {
+    const dir = await mkdtemp(join(process.env.TMPDIR || tmpdir(), "portfolio-seed-cv-"));
+    const path = join(dir, "cv.pdf");
+    try {
+      await writeFile(path, PDF);
+      vi.stubEnv("CV_PATH", path);
+      await runSeed({ force: false, fetchCv: okCv as unknown as typeof fetch, uploadFile });
+      expect(okCv).not.toHaveBeenCalled();
+      expect(uploadFile).toHaveBeenCalledWith(PDF, "pdf", "application/pdf");
+      expect((await db.select().from(profile))[0].cvKey).toMatch(/\.pdf$/);
+    } finally {
+      vi.unstubAllEnvs(); await rm(dir, { recursive: true, force: true });
+    }
   });
 
   it("second run without --force skips and changes nothing", async () => {
