@@ -50,6 +50,8 @@ export const COLLECTION_BODY_BYTES = 128 * 1024;
 export const SETTINGS_BODY_BYTES = 160 * 1024;
 
 export async function readJson<S extends ZodTypeAny>(req: Request, schema: S, maxBytes = DEFAULT_BODY_BYTES): Promise<z.infer<S>> {
+  const declared = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > maxBytes) throw fail("too_large", "Request is too large.");
   const text = await req.text();
   if (new TextEncoder().encode(text).byteLength > maxBytes) throw fail("too_large", "Request is too large.");
   let data: unknown;

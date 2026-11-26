@@ -1,6 +1,7 @@
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { Dither } from "./Dither";
+import { setMotionPaused } from "./motion";
 const clearRect = vi.fn(), fillRect = vi.fn();
 function setup(reduced: boolean) {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: reduced, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
@@ -31,4 +32,21 @@ it("cancels its animation loop and disconnects observation on unmount", () => {
   vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect = disconnect; });
   const { unmount } = render(<Dither animate />); unmount();
   expect(cancel).toHaveBeenCalledWith(42); expect(disconnect).toHaveBeenCalled();
+});
+it("survives reduced-motion and pause toggles while mounted, stopping and restarting the loop", () => {
+  let reduced = false; const fire: (() => void)[] = [];
+  vi.stubGlobal("matchMedia", vi.fn(() => ({ get matches() { return reduced; }, addEventListener: (_: string, f: () => void) => fire.push(f), removeEventListener: vi.fn() })));
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({ clearRect, fillRect, setTransform: vi.fn() } as unknown as CanvasRenderingContext2D);
+  const raf = vi.fn(() => 7); vi.stubGlobal("requestAnimationFrame", raf); vi.stubGlobal("cancelAnimationFrame", vi.fn());
+  const { container } = render(<Dither animate />);
+  expect(raf).toHaveBeenCalledTimes(1);
+  act(() => { reduced = true; fire.forEach(f => f()); });
+  expect(container.querySelector("canvas")).toBeInTheDocument(); expect(raf).toHaveBeenCalledTimes(1);
+  act(() => { reduced = false; fire.forEach(f => f()); });
+  expect(raf).toHaveBeenCalledTimes(2);
+  act(() => setMotionPaused(true)); expect(raf).toHaveBeenCalledTimes(2);
+  act(() => { reduced = true; fire.forEach(f => f()); });
+  act(() => setMotionPaused(false)); expect(raf).toHaveBeenCalledTimes(2);
+  act(() => { reduced = false; fire.forEach(f => f()); });
+  expect(raf).toHaveBeenCalledTimes(3);
 });
