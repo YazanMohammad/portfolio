@@ -43,7 +43,7 @@ function describeTarget(env: NonNullable<CliOptions["env"]>, envFromFile?: Reado
   const database = decodeURIComponent(url.pathname.replace(/^\//, "")) || "(default)";
   const source = envFromFile === undefined ? "" : envFromFile.has("DATABASE_URL") ? " (DATABASE_URL from .env)" : " (DATABASE_URL from the shell)";
   const test = env.DATABASE_URL_TEST ? parseDatabaseUrl(env.DATABASE_URL_TEST) : null;
-  const match = !env.DATABASE_URL_TEST ? "no (DATABASE_URL_TEST is not set)" : test && test.hostname === url.hostname ? "yes" : "no";
+  const match = !env.DATABASE_URL_TEST ? "no (DATABASE_URL_TEST is not set)" : test && test.hostname.toLowerCase() === url.hostname.toLowerCase() ? "yes" : "no";
   return [`Target database: ${url.host} / ${database}${source}`, `Matches DATABASE_URL_TEST host: ${match}`];
 }
 

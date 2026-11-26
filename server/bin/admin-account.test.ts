@@ -121,6 +121,13 @@ describe("database target", () => {
     expect(stderr.text()).toContain("Matches DATABASE_URL_TEST host: no (DATABASE_URL_TEST is not set)");
   });
 
+  it("compares the DATABASE_URL and DATABASE_URL_TEST hosts case-insensitively", async () => {
+    const stderr = sink();
+    await run({ stdin: piped(`admin\n${PASSWORD}\n${PASSWORD}\n`), stdout: sink(), stderr },
+      { env: { DATABASE_URL: "postgres://u:p@DB.Example.INVALID/neondb", DATABASE_URL_TEST: "postgres://u:p@db.example.invalid/other" }, args: ["--yes"] });
+    expect(stderr.text()).toContain("Matches DATABASE_URL_TEST host: yes");
+  });
+
   it("reports a match with the TEST host", async () => {
     const stderr = sink();
     await run({ stdin: piped(`admin\n${PASSWORD}\n${PASSWORD}\n`), stdout: sink(), stderr }, target);

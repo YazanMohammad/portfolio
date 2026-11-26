@@ -12,7 +12,7 @@ import { sessionCookie } from "../../server/sessions";
 // password; it needs the current password and shares the login rate limit. On success every
 // session ends and this browser gets a fresh one; a stale request (credentials changed after it
 // verified them) gets 409.
-export default adminHandler(async (req, ctx) => {
+export default adminHandler(async (req, ctx, auth) => {
   if (new URL(req.url).pathname !== "/api/admin/account" || !["GET", "PUT"].includes(req.method)) throw notFound();
   if (req.method === "GET") return json({ username: (await readAdminAccount())?.username ?? null });
 
@@ -22,12 +22,15 @@ export default adminHandler(async (req, ctx) => {
   if (!reservation.allowed) throw fail("rate_limited", "Try again later.", { retryAfter: reservation.retryAfter });
   const { ok, account } = await checkAdminPassword(input.currentPassword);
   if (!ok || !account) throw fail("unauthorized", "Wrong current password.", { fields: { currentPassword: "Wrong password." } });
+  // The password must have been checked against the credentials of the authorizing session's
+  // epoch; a newer account (rotated after authorization) is a stale request.
+  if (account.version !== auth.accountVersion) throw fail("conflict", "Your account changed. Reload and try again.");
   await markLoginSuccess(ipHash, reservation.attemptId);
 
   const passwordHash = input.newPassword === undefined ? account.passwordHash : await hashPassword(input.newPassword);
-  // Compare-and-set on the verified credential version: a request that verified credentials which
-  // changed meanwhile (another save, a CLI reset) writes nothing and gets no session.
-  const session = await updateAdminAccountIfCurrent(account.version, input.username, passwordHash);
+  // Compare-and-set on the authorizing session's epoch and that session still being live: a request
+  // whose credentials changed (another save, a CLI reset) or whose session ended writes nothing.
+  const session = await updateAdminAccountIfCurrent(auth, input.username, passwordHash);
   if (!session) throw fail("conflict", "Your account changed. Reload and try again.");
   return json({ username: input.username }, { headers: { "Set-Cookie": sessionCookie(session.token) } });
 });

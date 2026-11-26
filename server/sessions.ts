@@ -17,7 +17,10 @@ const CLEANUP_BATCH = 100;
 // 32 bytes in base64url (no padding) is always 43 chars.
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
-type SessionCheck = { valid: boolean; renewed: boolean };
+// The session that authorized a request: its row id (the token's SHA-256) and the credential
+// version it was issued for. Handlers that change credentials must bind their write to these.
+export type AuthorizedSession = { id: string; accountVersion: number };
+type SessionCheck = { valid: false; renewed: false } | { valid: true; renewed: boolean; session: AuthorizedSession };
 const INVALID: SessionCheck = { valid: false, renewed: false };
 
 function isTokenFormat(token: string): boolean {
@@ -75,19 +78,20 @@ export async function validateSession(token: string | null, now: Date = new Date
   // whose timing could leak the token.
   const id = hashToken(token);
   const [found] = await db
-    .select({ lastSeenAt: adminSessions.lastSeenAt })
+    .select({ lastSeenAt: adminSessions.lastSeenAt, accountVersion: adminSessions.accountVersion })
     .from(adminSessions)
     .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now), eq(adminSessions.accountVersion, CURRENT_ACCOUNT_VERSION)));
-  if (!found) return INVALID;
-  if (!shouldRenew(found.lastSeenAt, now)) return { valid: true, renewed: false };
+  if (!found || found.accountVersion === null) return INVALID;
+  const session: AuthorizedSession = { id, accountVersion: found.accountVersion };
+  if (!shouldRenew(found.lastSeenAt, now)) return { valid: true, renewed: false, session };
 
   // Renew only a row that still exists and is still live (logout may have deleted it meanwhile).
   const renewed = await db
     .update(adminSessions)
     .set({ expiresAt: new Date(now.getTime() + SESSION_MS), lastSeenAt: now })
-    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now), eq(adminSessions.accountVersion, CURRENT_ACCOUNT_VERSION)))
+    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now), eq(adminSessions.accountVersion, session.accountVersion)))
     .returning({ id: adminSessions.id });
-  return renewed.length > 0 ? { valid: true, renewed: true } : INVALID;
+  return renewed.length > 0 ? { valid: true, renewed: true, session } : INVALID;
 }
 
 export async function deleteSession(token: string): Promise<void> {
@@ -131,10 +135,10 @@ export function readSessionToken(req: Request): string | null {
   return null;
 }
 
-export async function requireAdmin(req: Request, now: Date = new Date()): Promise<{ renewedCookie: string | null }> {
+export async function requireAdmin(req: Request, now: Date = new Date()): Promise<{ renewedCookie: string | null; session: AuthorizedSession }> {
   const token = readSessionToken(req);
-  const { valid, renewed } = await validateSession(token, now);
-  if (!valid || token === null) throw fail("unauthorized", "Please log in.");
+  const check = await validateSession(token, now);
+  if (!check.valid || token === null) throw fail("unauthorized", "Please log in.");
   // The DB expiry moved, so refresh the browser's Max-Age too.
-  return { renewedCookie: renewed ? sessionCookie(token) : null };
+  return { renewedCookie: check.renewed ? sessionCookie(token) : null, session: check.session };
 }

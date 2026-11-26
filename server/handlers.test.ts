@@ -13,12 +13,13 @@ vi.mock("./sessions", async (importOriginal) => {
 const ORIGIN = "https://www.yznmoh.com";
 const RENEWED = "__Host-session=renewed; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800";
 const ctx = {} as Context;
+const SESSION = { id: "s".repeat(64), accountVersion: 4 };
 const admin = vi.mocked(requireAdmin);
 
 beforeEach(() => {
   vi.stubEnv("SITE_ORIGIN", ORIGIN);
   admin.mockReset();
-  admin.mockResolvedValue({ renewedCookie: null });
+  admin.mockResolvedValue({ renewedCookie: null, session: SESSION });
 });
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
 
@@ -30,7 +31,7 @@ function fakeRequest(method: string, origin?: string): Request {
 }
 
 it("a renewed cookie is added to the response", async () => {
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const response = await adminHandler(async () => json({ ok: true }, { headers: { "Set-Cookie": "other=1" } }))(fakeRequest("GET"), ctx);
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({ ok: true });
@@ -38,14 +39,14 @@ it("a renewed cookie is added to the response", async () => {
 });
 
 it("a renewed cookie is added to a handler error response too", async () => {
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const response = await adminHandler(async () => json({ error: "x" }, { status: 404 }))(fakeRequest("GET"), ctx);
   expect(response.status).toBe(404);
   expect(response.headers.getSetCookie()).toEqual([RENEWED]);
 });
 
 it("thrown handler error keeps the renewed cookie", async () => {
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const response = await adminHandler(async () => { throw fail("not_found", "Not found."); })(fakeRequest("GET"), ctx);
   expect(response.status).toBe(404);
   expect(await response.json()).toEqual({ error: { code: "not_found", message: "Not found." } });
@@ -54,7 +55,7 @@ it("thrown handler error keeps the renewed cookie", async () => {
 
 it("unexpected thrown error keeps the renewed cookie on the generic 500", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const response = await adminHandler(async () => { throw new Error("boom"); })(fakeRequest("GET"), ctx);
   expect(response.status).toBe(500);
   expect((await response.json()).error.code).toBe("server");
@@ -84,7 +85,7 @@ it("no cookie is added when the session was not renewed", async () => {
 
 it("decoration failure gives generic 500", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   // Response.error() has status 0, which cannot be copied into a new Response: decoration throws.
   const response = await adminHandler(async () => Response.error())(fakeRequest("GET"), ctx);
   expect(response.status).toBe(500);
@@ -93,7 +94,7 @@ it("decoration failure gives generic 500", async () => {
 
 it("a consumed body during decoration yields the generic 500 JSON", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const response = await adminHandler(async () => {
     const used = json({ ok: true });
     await used.text();
@@ -146,8 +147,14 @@ it("shouldRenew renews only after more than one hour", () => {
 });
 
 it("a handler that sets its own session cookie (rotation) is not overridden by the renewal", async () => {
-  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  admin.mockResolvedValue({ renewedCookie: RENEWED, session: SESSION });
   const rotated = "__Host-session=rotated; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800";
   const response = await adminHandler(async () => json({ ok: true }, { headers: { "Set-Cookie": rotated } }))(fakeRequest("PUT", ORIGIN), ctx);
   expect(response.headers.getSetCookie()).toEqual([rotated]);
+});
+
+it("the handler receives the session that authorized the request", async () => {
+  const fn = vi.fn(async () => json({ ok: true }));
+  await adminHandler(fn)(fakeRequest("PUT", ORIGIN), ctx);
+  expect(fn).toHaveBeenCalledWith(expect.anything(), ctx, SESSION);
 });

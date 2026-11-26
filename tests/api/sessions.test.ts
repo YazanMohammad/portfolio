@@ -74,7 +74,7 @@ describeDb("sessions (real db)", () => {
   it("valid session validates", async () => {
     const now = new Date();
     const { token } = await fresh(now);
-    expect(await validateSession(token, new Date(now.getTime() + MIN))).toEqual({ valid: true, renewed: false });
+    expect(await validateSession(token, new Date(now.getTime() + MIN))).toMatchObject({ valid: true, renewed: false });
   });
 
   it("expired session is rejected", async () => {
@@ -104,15 +104,15 @@ describeDb("sessions (real db)", () => {
   it("renews only after an hour", async () => {
     const now = new Date();
     const { token, expiresAt } = await fresh(now);
-    expect(await validateSession(token, new Date(now.getTime() + 30 * MIN))).toEqual({ valid: true, renewed: false });
+    expect(await validateSession(token, new Date(now.getTime() + 30 * MIN))).toMatchObject({ valid: true, renewed: false });
     expect((await row(token))?.expiresAt.getTime()).toBe(expiresAt.getTime());
     const later = new Date(now.getTime() + 2 * 60 * MIN);
-    expect(await validateSession(token, later)).toEqual({ valid: true, renewed: true });
+    expect(await validateSession(token, later)).toMatchObject({ valid: true, renewed: true });
     const renewed = await row(token);
     expect(renewed?.expiresAt.getTime()).toBe(later.getTime() + 7 * DAY);
     expect(renewed?.lastSeenAt.getTime()).toBe(later.getTime());
     // Just renewed, so the next call does not renew again.
-    expect(await validateSession(token, new Date(later.getTime() + MIN))).toEqual({ valid: true, renewed: false });
+    expect(await validateSession(token, new Date(later.getTime() + MIN))).toMatchObject({ valid: true, renewed: false });
   });
 
   it("createSession removes long-expired rows but keeps live ones", async () => {
@@ -131,7 +131,10 @@ describeDb("sessions (real db)", () => {
   it("requireAdmin returns a renewed cookie only after renewal", async () => {
     const now = new Date();
     const { token } = await fresh(now);
-    expect(await requireAdmin(request(token), new Date(now.getTime() + MIN))).toEqual({ renewedCookie: null });
+    const first = await requireAdmin(request(token), new Date(now.getTime() + MIN));
+    expect(first.renewedCookie).toBeNull();
+    // The authorizing session: its row id and the credential version it was issued for.
+    expect(first.session).toEqual({ id: crypto.createHash("sha256").update(token).digest("hex"), accountVersion: expect.any(Number) });
     const { renewedCookie } = await requireAdmin(request(token), new Date(now.getTime() + 2 * 60 * MIN));
     expect(renewedCookie).toContain(`__Host-session=${token};`);
     expect(renewedCookie).toContain("Max-Age=604800");

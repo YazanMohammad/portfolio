@@ -62,11 +62,13 @@ export async function saveAdminAccount(username: string, passwordHash: string, n
   ]);
 }
 
-// Account page save: compare-and-set on the version the request verified. One statement: the
-// update applies only if the row still has that version; then all sessions are deleted and one
-// new session is issued for the new version. A stale request changes nothing and gets null.
+// Account page save, bound to the session that authorized the request. One statement: the update
+// applies only if the account is still at the authorized session's credential version AND that
+// session row still exists for that version and has not expired (not logged out, not revoked).
+// Then all sessions are deleted and one new session is issued for the new version. A stale or
+// revoked request changes nothing and gets null.
 export async function updateAdminAccountIfCurrent(
-  verifiedVersion: number, username: string, passwordHash: string, now: Date = new Date(),
+  authorized: { id: string; accountVersion: number }, username: string, passwordHash: string, now: Date = new Date(),
 ): Promise<{ token: string; expiresAt: Date } | null> {
   const session = newSession(now);
   const at = sql`${now.toISOString()}::timestamptz`;
@@ -75,7 +77,9 @@ export async function updateAdminAccountIfCurrent(
       UPDATE admin_account
       SET username = ${normalizeUsername(username)}::text, password_hash = ${passwordHash}::text,
           version = version + 1, updated_at = ${at}
-      WHERE id = 1 AND version = ${verifiedVersion}::integer
+      WHERE id = 1 AND version = ${authorized.accountVersion}::integer
+        AND EXISTS (SELECT 1 FROM admin_sessions s WHERE s.id = ${authorized.id}::text
+          AND s.account_version = ${authorized.accountVersion}::integer AND s.expires_at > ${at})
       RETURNING version
     ), wiped AS (
       DELETE FROM admin_sessions WHERE EXISTS (SELECT 1 FROM updated)
