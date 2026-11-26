@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { formatMessageDate } from "@/lib/admin/format-date";
 import type { Message, MessagePatch } from "@shared/index";
 import { useDeleteMessage, usePatchMessage } from "@/lib/admin/queries";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export function MessageView({ initial, onSaved, onClose }: {
     <div className="space-y-1">
       <p className="font-medium">{message.name}</p>
     <a className="break-all underline" href={`mailto:${encodeURIComponent(message.email).replace(/%40/gi, "@")}`}>{message.email}</a>
-      <p className="text-xs text-muted-foreground">Received <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("en-GB")}</time></p>
+      <p className="text-xs text-muted-foreground">Received <time dateTime={message.createdAt}>{formatMessageDate(message.createdAt)}</time></p>
     </div>
     <div className="flex flex-wrap items-center gap-2">
       <Button asChild variant="outline" className="h-9"><a href={replyHref(message)}>Reply by email</a></Button>

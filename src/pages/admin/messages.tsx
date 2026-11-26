@@ -34,7 +34,7 @@ export default function Messages() {
     navigate(`${location}${params.size ? `?${params}` : ""}`);
   };
   return <section className="space-y-4 text-sm">
-    <PageHeader kicker="Inbox" title="Inbox" intro="Messages from your site."/>
+    <PageHeader kicker="Messages" title="Inbox" intro="Messages from your site."/>
     <Tabs value={status} onValueChange={value => setStatus(value as MessageStatus)}>
       <TabsList aria-label="Message folders" className="admin-inbox-tabs h-auto">
         <TabsTrigger value="unread">Unread</TabsTrigger><TabsTrigger value="all">All</TabsTrigger><TabsTrigger value="archived">Archived</TabsTrigger>
