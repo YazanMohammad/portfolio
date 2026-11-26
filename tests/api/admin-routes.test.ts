@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { count } from "drizzle-orm";
 import { db } from "../../db/client";
-import { adminSessions, education, experience, loginAttempts, messages, profile, projects, siteState, skills } from "../../db/schema";
+import { adminAccount, adminSessions, education, experience, loginAttempts, messages, profile, projects, siteState, skills } from "../../db/schema";
 import { cookieName, createSession } from "../../server/sessions";
 import { ADMIN_ROUTES, FOREIGN, READ_ROUTES, WRITE_ROUTES, errorCode, label, send } from "./admin-routes";
 import { blobStore, loginCookie, purgeSpy, resetDb, seedMinimal } from "./helpers";
@@ -9,7 +9,7 @@ import { describeDb } from "./describe-db";
 
 // OWED-DB: needs the isolated test database. The database-free checks live in admin-routes.unit.test.ts.
 const DAY = 24 * 60 * 60_000;
-const TABLES = { profile, projects, experience, education, skills, messages, loginAttempts, adminSessions, siteState };
+const TABLES = { adminAccount, profile, projects, experience, education, skills, messages, loginAttempts, adminSessions, siteState };
 
 async function rowCounts(): Promise<Record<string, number>> {
   const result: Record<string, number> = {};

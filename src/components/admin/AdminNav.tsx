@@ -2,6 +2,7 @@ import {
   Briefcase,
   FolderKanban,
   GraduationCap,
+  KeyRound,
   LayoutDashboard,
   Mail,
   Palette,
@@ -14,15 +15,17 @@ import { useLocation } from "wouter";
 import { GuardedLink, usePageDirty } from "@/lib/admin/unsaved";
 import { cn } from "@/lib/utils";
 
+// In sidebar order: Dashboard, Content, Site, Inbox.
 const ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/site-text", label: "Site text", icon: Type },
-  { to: "/admin/look", label: "Look", icon: Palette },
   { to: "/admin/profile", label: "Profile", icon: User },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
   { to: "/admin/experience", label: "Experience", icon: Briefcase },
   { to: "/admin/education", label: "Education", icon: GraduationCap },
   { to: "/admin/skills", label: "Skills", icon: Wrench },
+  { to: "/admin/site-text", label: "Site text", icon: Type },
+  { to: "/admin/look", label: "Look", icon: Palette },
+  { to: "/admin/account", label: "Account", icon: KeyRound },
   { to: "/admin/messages", label: "Messages", icon: Mail },
 ];
 
@@ -39,7 +42,7 @@ export function AdminNav({
   const dirty = usePageDirty();
   return (
     <nav aria-label="Admin" className="flex flex-col gap-1 p-2">
-      {[ITEMS[0], ...ITEMS.slice(3,8), ...ITEMS.slice(1,3), ITEMS[8]].map(({ to, label, icon: Icon }) => {
+      {ITEMS.map(({ to, label, icon: Icon }) => {
         const current = location === to || location.startsWith(`${to}/`);
         const unread = to === "/admin/messages" && unreadCount > 0;
         return (

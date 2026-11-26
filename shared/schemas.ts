@@ -120,3 +120,11 @@ export const ADMIN_PASSWORD_MIN = 12;
 export const AdminUsername = z.string().trim().min(3, "Use 3 to 64 characters.").max(64, "Use 3 to 64 characters.");
 export const AdminPassword = z.string().max(200, "Use at most 200 characters.")
   .refine((value) => [...value].length >= ADMIN_PASSWORD_MIN, `Use at least ${ADMIN_PASSWORD_MIN} characters.`);
+
+// PUT /api/admin/account. Omit newPassword to keep the password.
+export const AccountInput = z.object({
+  currentPassword: z.string().min(1, "Enter your current password.").max(200),
+  username: AdminUsername,
+  newPassword: AdminPassword.optional(),
+}).strict();
+export type AccountInput = z.infer<typeof AccountInput>;

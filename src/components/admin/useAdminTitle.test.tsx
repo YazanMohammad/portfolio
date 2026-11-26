@@ -15,6 +15,7 @@ describe("admin titles", () => {
     expect(adminTitleFor("/admin/projects")).toBe("Projects · Admin");
     expect(adminTitleFor("/admin/site-text")).toBe("Site text · Admin");
     expect(adminTitleFor("/admin/look")).toBe("Look · Admin");
+    expect(adminTitleFor("/admin/account")).toBe("Account · Admin");
     expect(adminTitleFor("/admin/messages/3")).toBe("Messages · Admin");
     expect(adminTitleFor("/admin")).toBe("Admin");
     const all = ["dashboard", "site-text", "look", "profile", "projects", "experience", "education", "skills", "messages"]

@@ -4,6 +4,7 @@ const TITLES: [string, string][] = [
   ["/admin/dashboard", "Dashboard"],
   ["/admin/site-text", "Site text"],
   ["/admin/look", "Look"],
+  ["/admin/account", "Account"],
   ["/admin/profile", "Profile"],
   ["/admin/projects", "Projects"],
   ["/admin/experience", "Experience"],

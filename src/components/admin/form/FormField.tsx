@@ -92,7 +92,8 @@ export function TextField({
   required,
   type = "text",
   maxLength,
-}: BaseProps & { type?: string; maxLength?: number }) {
+  autoComplete,
+}: BaseProps & { type?: string; maxLength?: number; autoComplete?: string }) {
   const f = useFieldIds(form, name, hint);
   return (
     <FieldShell id={f.id} label={label} required={required} hint={hint} hintId={f.hintId} error={f.error} errorId={f.errorId}>
@@ -100,6 +101,7 @@ export function TextField({
         id={f.id}
         type={type}
         maxLength={maxLength}
+        autoComplete={autoComplete}
         aria-invalid={f.error ? true : undefined}
         aria-describedby={f.describedBy}
         {...form.register(name)}

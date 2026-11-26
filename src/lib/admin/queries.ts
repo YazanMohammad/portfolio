@@ -16,6 +16,7 @@ import type {
   MessagePatch,
   Profile,
   ProfileInput,
+  AccountInput,
 } from "@shared/index";
 
 export type { Collection };
@@ -50,6 +51,8 @@ export function makeQueryClient(navigate: Navigate = browserNavigate): QueryClie
     mutationCache: new MutationCache({
       onError: (err, _vars, _ctx, mutation) => {
         if (mutation.options.mutationKey?.[0] === "login") return;
+        // A wrong current password on the Account page is a 401 too, but the session is fine.
+        if (mutation.options.mutationKey?.[0] === "account" && err instanceof ApiRequestError && err.fields?.currentPassword) return;
         handleAuthLost(client, err, navigate);
       },
     }),
@@ -191,6 +194,21 @@ export function useDeleteMessage() {
   return useMutation<void, ApiRequestError, { id: number }>({
     mutationFn: ({ id }) => apiSend<void>("DELETE", `/api/admin/messages/${id}`),
     onSuccess: () => after([["admin", "messages"]]),
+  });
+}
+
+const accountKey = ["admin", "account"] as const;
+
+export function useAdminAccount() {
+  return useQuery({ queryKey: accountKey, queryFn: () => apiGet<{ username: string | null }>("/api/admin/account") });
+}
+
+export function useSaveAccount() {
+  const qc = useQueryClient();
+  return useMutation<{ username: string }, ApiRequestError, AccountInput>({
+    mutationKey: ["account"],
+    mutationFn: (input) => apiSend<{ username: string }>("PUT", "/api/admin/account", input),
+    onSuccess: (saved) => { qc.setQueryData(accountKey, saved); },
   });
 }
 

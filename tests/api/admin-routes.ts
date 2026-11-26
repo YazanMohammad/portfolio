@@ -1,4 +1,5 @@
 import type { Context } from "@netlify/functions";
+import adminAccount from "../../netlify/functions/admin-account";
 import adminCollection from "../../netlify/functions/admin-collection";
 import adminFiles from "../../netlify/functions/admin-files";
 import adminMessages from "../../netlify/functions/admin-messages";
@@ -12,6 +13,7 @@ import authMe from "../../netlify/functions/auth-me";
 // fails otherwise).
 type Handler = (req: Request, ctx: Context) => Promise<Response>;
 export const HANDLERS = {
+  "admin-account.ts": adminAccount,
   "admin-collection.ts": adminCollection,
   "admin-files.ts": adminFiles,
   "admin-messages.ts": adminMessages,
@@ -31,6 +33,8 @@ export const ADMIN_ROUTES: AdminRoute[] = [
   { method: "PUT", path: "/api/admin/profile", file: "admin-profile.ts" },
   { method: "GET", path: "/api/admin/settings", file: "admin-settings.ts" },
   { method: "PUT", path: "/api/admin/settings", file: "admin-settings.ts" },
+  { method: "GET", path: "/api/admin/account", file: "admin-account.ts" },
+  { method: "PUT", path: "/api/admin/account", file: "admin-account.ts" },
   ...COLLECTIONS.flatMap((name): AdminRoute[] => [
     { method: "GET", path: `/api/admin/${name}`, file: "admin-collection.ts" },
     { method: "POST", path: `/api/admin/${name}`, file: "admin-collection.ts" },

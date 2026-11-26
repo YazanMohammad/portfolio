@@ -1,7 +1,7 @@
 import type { Context } from "@netlify/functions";
 import { errorResponse, handle } from "./http";
 import { checkOrigin } from "./origin";
-import { requireAdmin } from "./sessions";
+import { cookieName, requireAdmin } from "./sessions";
 
 const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -22,7 +22,9 @@ export function adminHandler(fn: (req: Request, ctx: Context) => Promise<Respons
       // The session was already renewed in the DB, so the error response must carry the cookie too.
       response = errorResponse(error);
     }
-    return renewedCookie === null ? response : withSetCookie(response, renewedCookie);
+    // A handler that issued a new session (account change) owns the cookie: never re-send the old one.
+    const rotated = response.headers.getSetCookie().some(value => value.startsWith(`${cookieName()}=`));
+    return renewedCookie === null || rotated ? response : withSetCookie(response, renewedCookie);
   });
 }
 

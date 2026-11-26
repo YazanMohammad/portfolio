@@ -19,6 +19,7 @@ vi.mock("@/pages/admin/skills", () => page("skills"));
 vi.mock("@/pages/admin/messages", () => page("messages"));
 vi.mock("@/pages/admin/site-text", () => page("site-text"));
 vi.mock("@/pages/admin/look", () => page("look"));
+vi.mock("@/pages/admin/account", () => page("account"));
 import App from "./App";
 
 const table: [string, string][] = [
@@ -29,6 +30,7 @@ const table: [string, string][] = [
   ["/admin/profile", "profile"],
   ["/admin/site-text", "site-text"],
   ["/admin/look", "look"],
+  ["/admin/account", "account"],
   ["/admin/projects", "projects"],
   ["/admin/experience", "experience"],
   ["/admin/education", "education"],

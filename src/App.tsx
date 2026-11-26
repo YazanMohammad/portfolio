@@ -18,6 +18,7 @@ const Messages = lazy(() => import("@/pages/admin/messages"));
 const SiteText = lazy(() => import("@/pages/admin/site-text"));
 const Look = lazy(() => import("@/pages/admin/look"));
 const Profile = lazy(() => import("@/pages/admin/profile"));
+const Account = lazy(() => import("@/pages/admin/account"));
 
 // One client for the whole app: site and admin share the cache and the admin 401 handler
 // (it only acts on 401s; public endpoints never return one).
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/admin/dashboard"><AdminRoute page={Dashboard} /></Route>
         <Route path="/admin/site-text"><AdminRoute page={SiteText} /></Route>
         <Route path="/admin/look"><AdminRoute page={Look} /></Route>
+        <Route path="/admin/account"><AdminRoute page={Account} /></Route>
         <Route path="/admin/profile"><AdminRoute page={Profile} /></Route>
         <Route path="/admin/projects"><AdminRoute page={Projects} /></Route>
         <Route path="/admin/experience"><AdminRoute page={Experience} /></Route>

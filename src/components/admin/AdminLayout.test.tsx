@@ -45,7 +45,7 @@ it("marks the dirty page and saves with Ctrl+S", async()=>{
   fireEvent.keyDown(document,{key:"s",ctrlKey:true});expect(save).toHaveBeenCalledOnce();
   await waitFor(()=>expect(screen.queryByLabelText("Profile has unsaved changes")).toBeNull());
 });
-const LINKS = ["Dashboard", "Profile", "Projects", "Experience", "Education", "Skills"];
+const LINKS = ["Dashboard", "Profile", "Projects", "Experience", "Education", "Skills", "Site text", "Look", "Account"];
 
 describe("AdminLayout", () => {
   beforeEach(() => {

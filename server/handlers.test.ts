@@ -144,3 +144,10 @@ it("shouldRenew renews only after more than one hour", () => {
   expect(shouldRenew(ago(60 * 60_000 + 1), now)).toBe(true);
   expect(shouldRenew(ago(2 * 60 * 60_000), now)).toBe(true);
 });
+
+it("a handler that sets its own session cookie (rotation) is not overridden by the renewal", async () => {
+  admin.mockResolvedValue({ renewedCookie: RENEWED });
+  const rotated = "__Host-session=rotated; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800";
+  const response = await adminHandler(async () => json({ ok: true }, { headers: { "Set-Cookie": rotated } }))(fakeRequest("PUT", ORIGIN), ctx);
+  expect(response.headers.getSetCookie()).toEqual([rotated]);
+});
