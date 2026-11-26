@@ -31,12 +31,10 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* SITE TOKENS START */
-/* dealt: palette blue-black-cornflower, type instrument (Instrument Sans + DM Mono), radius sharp. Fonts are self-hosted from /fonts. */
+/* type instrument (Instrument Sans + DM Mono), radius sharp. Fonts are self-hosted from /fonts. */
 :root {
-  --p-bg: #0a0d14; --p-surface: #131824; --p-ink: #e9edf3; --p-muted: #8891a1;
-  --p-accent: #5ab9fc; --p-accent-ink: #0a0d14; --p-action: #5ab9fc; --p-action-ink: #0a0d14;
-  --p-inv-bg: #e9edf3; --p-inv-surface: #d7dbe1; --p-inv-ink: #0a0d14; --p-inv-muted: #54575f;
-  --p-inv-accent: #0a0d14; --p-inv-accent-ink: #e9edf3; --p-inv-action: #0a0d14; --p-inv-action-ink: #e9edf3;
+  --p-bg: #0c0c0c; --p-surface: #141414; --p-ink: #eaeaea; --p-muted: #a3a3a3;
+  --p-accent: #d4ff3a; --p-action: #d4ff3a; --p-action-ink: #0c0c0c;
   --font-display: "Instrument Sans", system-ui, sans-serif;
   --font-text: "Instrument Sans", system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;

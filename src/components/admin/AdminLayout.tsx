@@ -9,6 +9,8 @@ import { disableKit } from "@/lib/admin/kit";
 import { useAdminSummary, useLogout } from "@/lib/admin/queries";
 import { UnsavedProvider, useGuardedAction } from "@/lib/admin/unsaved";
 import { AdminNav } from "./AdminNav";
+import { adminTitleFor, useAdminTitle } from "./useAdminTitle";
+import { adminAccentText } from "@/lib/admin/accent-text";
 
 import { mergeSettings, derivePalette, type AdminSettings } from "@shared/settings";
 import { apiGet } from "@/lib/api";
@@ -31,20 +33,24 @@ function useIsMobile(): boolean {
 function Shell({ children }: { children: ReactNode }) {
   const mobile = useIsMobile();
   const [open, setOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  useAdminTitle(adminTitleFor(location));
   const queryClient = useQueryClient();
   const summary = useAdminSummary();
   const logout = useLogout();
   const guarded = useGuardedAction();
   const unread = summary.data?.unreadCount ?? 0;
   const settings = useQuery({queryKey:["admin","settings"],queryFn:()=>apiGet<AdminSettings>("/api/admin/settings"),retry:false});
-  const palette = derivePalette(mergeSettings(settings.data).theme.hue);
+  const hue = mergeSettings(settings.data).theme.hue;
+  const palette = derivePalette(hue);
+  const accentText = adminAccentText(hue);
   useEffect(()=>{
     document.body.classList.add("admin-active");
     document.body.style.setProperty("--admin-accent",palette.accent);
     document.body.style.setProperty("--admin-on-accent",palette.onAccent);
-    return ()=>{document.body.classList.remove("admin-active");document.body.style.removeProperty("--admin-accent");document.body.style.removeProperty("--admin-on-accent");};
-  },[palette.accent,palette.onAccent]);
+    document.body.style.setProperty("--admin-accent-text",accentText);
+    return ()=>{document.body.classList.remove("admin-active");for(const v of ["--admin-accent","--admin-on-accent","--admin-accent-text"])document.body.style.removeProperty(v);};
+  },[palette.accent,palette.onAccent,accentText]);
 
   useEffect(() => {
     disableKit();
@@ -75,6 +81,7 @@ function Shell({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="admin-topbar flex h-12 items-center gap-2 border-b border-border px-4">
           {mobile && (
+            <>
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="size-11" aria-label="Open menu">
@@ -89,12 +96,14 @@ function Shell({ children }: { children: ReactNode }) {
                 <AdminNav unreadCount={unread} tall onNavigate={() => setOpen(false)} />
               </SheetContent>
             </Sheet>
+            <span className="admin-brand-inline"><span className="admin-brand-mark" aria-hidden="true" />Portfolio</span>
+            </>
           )}
           <p className="admin-last-saved">Last saved <time>{summary.data?.lastSavedAt ? new Date(summary.data.lastSavedAt).toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "—"}</time></p>
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost" className={mobile ? "min-h-11" : "h-9"}>
               <a href="/" target="_blank" rel="noopener">
-                View site
+                <span>View site<span className="sr-only"> (opens in new tab)</span></span>
                 <ExternalLink className="size-4" aria-hidden="true" />
               </a>
             </Button>
