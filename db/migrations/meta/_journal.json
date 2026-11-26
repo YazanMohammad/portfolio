@@ -15,6 +15,13 @@
       "when": 1795701213140,
       "tag": "0001_familiar_titania",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795721433141,
+      "tag": "0002_typical_onslaught",
+      "breakpoints": true
     }
   ]
 }

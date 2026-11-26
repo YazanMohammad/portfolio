@@ -13,7 +13,7 @@ describe("portfolio schema", () => {
   });
 
   it("enforces singleton profile and site state rows", () => {
-    for (const table of [schema.profile, schema.siteState, schema.siteSettings]) {
+    for (const table of [schema.profile, schema.siteState, schema.siteSettings, schema.adminAccount]) {
       const config = getTableConfig(table);
       expect(config.checks).toHaveLength(1);
       const id = config.columns.find((column) => column.name === "id");
@@ -33,9 +33,19 @@ describe("portfolio schema", () => {
     }
   });
 
-  it("exports only the ten supported tables", () => {
+  it("stores the admin account as a singleton username and password hash", () => {
+    const config = getTableConfig(schema.adminAccount);
+    expect(config.name).toBe("admin_account");
+    const byName = Object.fromEntries(config.columns.map((column) => [column.name, column]));
+    expect(Object.keys(byName).sort()).toEqual(["id", "password_hash", "updated_at", "username"]);
+    expect(byName.username.notNull).toBe(true);
+    expect(byName.password_hash.notNull).toBe(true);
+    expect(byName.updated_at.notNull).toBe(true);
+  });
+
+  it("exports only the eleven supported tables", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "adminSessions", "education", "experience", "loginAttempts", "messages",
+      "adminAccount", "adminSessions", "education", "experience", "loginAttempts", "messages",
       "profile", "projects", "siteSettings", "siteState", "skills",
     ]);
     for (const name of ["testimonials", "blogPosts", "settings", "users"]) {

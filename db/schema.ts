@@ -104,6 +104,15 @@ export const adminSessions = pgTable("admin_sessions", {
   lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
 });
 
+// The one admin login (singleton). Username is stored trimmed and compared case-insensitively;
+// password_hash uses the scrypt format of server/password.ts. Set it with `pnpm admin:create`.
+export const adminAccount = pgTable("admin_account", {
+  id: integer("id").primaryKey().default(1),
+  username: text("username").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+}, (table) => [check("admin_account_singleton", sql`${table.id} = 1`)]);
+
 export const siteState = pgTable("site_state", {
   id: integer("id").primaryKey().default(1),
   lastSavedAt: timestamp("last_saved_at", { withTimezone: true, mode: "date" }),
