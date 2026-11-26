@@ -40,6 +40,14 @@ describe("AdminDashboard", () => {
     expect(screen.getByLabelText('1 projects hidden')).toBeInTheDocument();
     expect(screen.getByLabelText('3 unread messages')).toBeInTheDocument();
   });
+  it("shows an error state instead of zero counts when the projects fetch fails", async () => {
+    vi.mocked(apiGet).mockImplementation(async path => { if (path === "/api/admin/projects") throw new Error("Unavailable"); return summary; });
+    renderDashboard();
+    expect(await screen.findByText(/Could not load projects/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("0 projects shown")).toBeNull();
+    expect(screen.getByLabelText("Projects shown unavailable")).toBeInTheDocument();
+  });
+
   it("keeps zero counts visible and renders fewer than three messages with an empty-subject fallback", async () => {
     vi.mocked(apiGet).mockResolvedValue({ ...summary,
       counts: { projects: 0, experience: 0, education: 0, skills: 0, messages: 1 },
