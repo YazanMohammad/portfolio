@@ -6,6 +6,7 @@ vi.mock("../../server/rate-limit", () => ({ reserveLoginAttempt: mocks.reserve, 
 vi.mock("../../server/password", () => ({ verifyPassword: mocks.verify }));
 vi.mock("../../server/sessions", async (original) => ({ ...await original<typeof import("../../server/sessions")>(), createSession: mocks.create, deleteSession: mocks.remove }));
 import login, { loginDelayMs } from "../../netlify/functions/auth-login";
+import { DUMMY_HASH } from "../../server/admin-account";
 import { hashIp } from "../../server/ip";
 
 it("logout without a session clears the cookie without DB I/O", async () => {
@@ -51,17 +52,21 @@ it("me POST and logout GET return 404 before authentication", async () => {
 
 const ctx = { ip: "203.0.113.10" } as Context;
 const token = "n".repeat(43);
-function request(body: unknown = { password: "right" }, method = "POST", origin = "https://site.test", cookie?: string) {
+const ACCOUNT = { username: "Admin", passwordHash: "configured" };
+let accountRows: { username: string; passwordHash: string }[] = [ACCOUNT];
+function request(body: unknown = { username: "admin", password: "right" }, method = "POST", origin = "https://site.test", cookie?: string) {
   const headers = new Headers({ Origin: origin, "Content-Type": "application/json" });
   if (cookie) headers.set("Cookie", cookie);
   return new Request("https://site.test/api/auth/login", { method, headers, ...(method === "POST" ? { body: JSON.stringify(body) } : {}) });
 }
+const WRONG = { error: { code: "unauthorized", message: "Wrong username or password." } };
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.stubEnv("SITE_ORIGIN", "https://site.test"); vi.stubEnv("SESSION_SECRET", Buffer.alloc(32, 7).toString("base64")); vi.stubEnv("ADMIN_PASSWORD_HASH", "configured");
+  vi.stubEnv("SITE_ORIGIN", "https://site.test"); vi.stubEnv("SESSION_SECRET", Buffer.alloc(32, 7).toString("base64"));
+  accountRows = [ACCOUNT];
   mocks.reserve.mockResolvedValue({ allowed: true, attemptId: 17 }); mocks.success.mockResolvedValue(undefined); mocks.verify.mockResolvedValue(true);
   mocks.create.mockResolvedValue({ token, expiresAt: new Date() }); mocks.remove.mockResolvedValue(undefined);
-  mocks.select.mockReturnValue({ from: () => ({ where: async () => [] }) });
+  mocks.select.mockImplementation(() => ({ from: () => ({ where: async () => accountRows }) }));
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 it("reserves then verifies, marks success, deletes old cookie before creating a session", async () => {
@@ -70,7 +75,8 @@ it("reserves then verifies, marks success, deletes old cookie before creating a 
   expect(response.headers.get("Set-Cookie")).toBe(`__Host-session=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`);
   const hash = hashIp(ctx.ip);
   expect(mocks.reserve).toHaveBeenCalledWith(hash); expect(mocks.success).toHaveBeenCalledWith(hash, 17);
-  expect(mocks.verify).toHaveBeenCalledWith("right", "configured"); expect(mocks.remove).toHaveBeenCalledWith("o".repeat(43));
+  expect(mocks.verify).toHaveBeenCalledOnce(); expect(mocks.verify).toHaveBeenCalledWith("right", "configured");
+  expect(mocks.remove).toHaveBeenCalledWith("o".repeat(43));
   const order = [mocks.reserve, mocks.verify, mocks.success, mocks.remove, mocks.create].map(fn => fn.mock.invocationCallOrder[0]);
   expect(order).toEqual([...order].sort((a, b) => a - b));
 });
@@ -81,27 +87,66 @@ it("successful login without an old cookie creates a session without deleting or
   expect(mocks.remove).not.toHaveBeenCalled(); expect(mocks.create).toHaveBeenCalledOnce();
   for (const log of logs) expect(log).not.toHaveBeenCalled();
 });
-it.each(["wrong", "missing", "malformed"])("%s password configuration or credential waits 500ms from entry", async (kind) => {
+it.each(["ADMIN", "  admin  ", "Admin"])("username %j matches case-insensitively after trimming", async (username) => {
+  expect((await login(request({ username, password: "right" }), ctx)).status).toBe(204);
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", "configured");
+});
+it("wrong username still runs one scrypt verify, against the dummy hash, and gets the generic 401", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const response = await login(request({ username: "someone", password: "right" }), ctx);
+  expect(response.status).toBe(401); expect(await response.json()).toEqual(WRONG);
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", DUMMY_HASH);
+  expect(mocks.success).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
+});
+it("wrong password runs one verify against the stored hash and gets the generic 401", async () => {
+  mocks.verify.mockResolvedValue(false);
+  const response = await login(request(), ctx);
+  expect(response.status).toBe(401); expect(await response.json()).toEqual(WRONG);
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", "configured");
+  expect(mocks.success).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
+});
+it("the dummy hash is a well-formed scrypt hash, so the no-match path does full scrypt work", () => {
+  expect(DUMMY_HASH).toMatch(/^scrypt\$16384\$8\$1\$[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}$/);
+});
+it("no admin account: verify still runs, generic 401, and one log line per instance without secrets", async () => {
+  vi.resetModules();
+  const { default: freshLogin } = await import("../../netlify/functions/auth-login");
+  const { DUMMY_HASH: dummy } = await import("../../server/admin-account");
+  accountRows = [];
+  const error = vi.spyOn(console, "error").mockImplementation(() => {});
+  for (let i = 0; i < 2; i++) {
+    const response = await freshLogin(request(), ctx);
+    expect(response.status).toBe(401); expect(await response.json()).toEqual(WRONG);
+  }
+  expect(mocks.verify).toHaveBeenCalledTimes(2);
+  for (const call of mocks.verify.mock.calls) expect(call).toEqual(["right", dummy]);
+  expect(error.mock.calls).toEqual([["No admin account. Run admin:create."]]);
+  expect(mocks.create).not.toHaveBeenCalled();
+});
+it.each(["wrong password", "wrong username", "no account", "malformed stored hash"])("%s waits 500ms from entry", async (kind) => {
   vi.useFakeTimers();
   const diagnostic = vi.spyOn(console, "error").mockImplementation(() => {});
-  if (kind === "missing") vi.stubEnv("ADMIN_PASSWORD_HASH", undefined);
-  if (kind === "malformed") vi.stubEnv("ADMIN_PASSWORD_HASH", "malformed-secret-do-not-log");
-  if (kind === "wrong") mocks.verify.mockResolvedValue(false);
-  else {
+  let body = { username: "admin", password: "right" };
+  if (kind === "wrong password") mocks.verify.mockResolvedValue(false);
+  if (kind === "wrong username") body = { username: "nobody", password: "right" };
+  if (kind === "no account") accountRows = [];
+  if (kind === "malformed stored hash") {
+    accountRows = [{ username: "Admin", passwordHash: "malformed-secret-do-not-log" }];
     const real = await vi.importActual<typeof import("../../server/password")>("../../server/password");
     mocks.verify.mockImplementation(real.verifyPassword);
   }
   // Reservation consumes 200ms: delay must count it, not start after verification.
   mocks.reserve.mockImplementationOnce(async () => { await new Promise(r => setTimeout(r, 200)); return { allowed: true, attemptId: 17 }; });
   let finished = false;
-  const pending = login(request(), ctx).then(response => { finished = true; return response; });
+  const pending = login(request(body), ctx).then(response => { finished = true; return response; });
   await vi.advanceTimersByTimeAsync(499); expect(finished).toBe(false);
   await vi.advanceTimersByTimeAsync(1);
   const response = await pending;
   expect(loginDelayMs).toBe(500); expect(response.status).toBe(401);
-  expect(await response.json()).toEqual({ error: { code: "unauthorized", message: "Wrong password." } });
+  expect(await response.json()).toEqual(WRONG);
+  expect(mocks.verify).toHaveBeenCalledOnce();
   expect(mocks.success).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
-  expect(diagnostic).toHaveBeenCalled(); expect(JSON.stringify(diagnostic.mock.calls)).not.toContain("malformed-secret-do-not-log");
+  expect(JSON.stringify(diagnostic.mock.calls)).not.toContain("malformed-secret-do-not-log");
 });
 it("does not add 500ms after a slow verification", async () => {
   vi.useFakeTimers(); vi.spyOn(console, "error").mockImplementation(() => {});
@@ -110,13 +155,15 @@ it("does not add 500ms after a slow verification", async () => {
   await vi.advanceTimersByTimeAsync(700);
   expect((await pending).status).toBe(401); expect(vi.getTimerCount()).toBe(0);
 });
-it("refused reservation returns Retry-After without password work", async () => {
+it("refused reservation returns Retry-After without account lookup or password work", async () => {
   mocks.reserve.mockResolvedValue({ allowed: false, retryAfter: 83 });
   const response = await login(request(), ctx);
   expect(response.status).toBe(429); expect(response.headers.get("Retry-After")).toBe("83");
+  expect(mocks.select).not.toHaveBeenCalled();
   expect(mocks.verify).not.toHaveBeenCalled(); expect(mocks.success).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
 });
-it.each([{}, [], { password: 5 }, { password: "right", extra: true }, { password: "" }])("rejects invalid login %j before reservation", async (body) => {
+it.each([{}, [], { password: "right" }, { username: "admin", password: 5 }, { username: 5, password: "right" },
+  { username: "admin", password: "right", extra: true }, { username: "admin", password: "" }, { username: "", password: "right" }])("rejects invalid login %j before reservation", async (body) => {
   expect((await login(request(body), ctx)).status).toBe(400); expect(mocks.reserve).not.toHaveBeenCalled();
 });
 it.each(["", "{bad"])("invalid JSON %j is 400 before reservation", async body => {

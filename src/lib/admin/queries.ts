@@ -196,9 +196,9 @@ export function useDeleteMessage() {
 
 export function useLogin() {
   const qc = useQueryClient();
-  return useMutation<void, ApiRequestError, { password: string }>({
+  return useMutation<void, ApiRequestError, { username: string; password: string }>({
     mutationKey: ["login"],
-    mutationFn: ({ password }) => apiSend<void>("POST", "/api/auth/login", { password }),
+    mutationFn: ({ username, password }) => apiSend<void>("POST", "/api/auth/login", { username, password }),
     onSuccess: () => qc.invalidateQueries({ queryKey: authKey }),
   });
 }

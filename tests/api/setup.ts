@@ -16,9 +16,7 @@ if (testPath.includes("/tests/api/") && !testPath.endsWith(".unit.test.ts") && p
   prepareTestDatabase(process.env);
   process.env.SITE_ORIGIN = "https://site.test";
   process.env.SESSION_SECRET = Buffer.alloc(32, 7).toString("base64");
-  const { TEST_PASSWORD, blobStore, purgeSpy } = await import("./helpers");
-  const { hashPassword } = await import("../../server/password");
-  process.env.ADMIN_PASSWORD_HASH = await hashPassword(TEST_PASSWORD);
+  const { blobStore, purgeSpy } = await import("./helpers");
   vi.doMock("@netlify/blobs", () => ({
     getStore: () => ({
       set: async (key: string, data: ArrayBuffer, options?: { metadata?: Record<string, unknown> }) => {

@@ -20,7 +20,7 @@ describe("Neon HTTP client", () => {
     const { projects } = await import("./schema");
     expect(getDb()).toBe(getDb());
     expect(Object.keys(db.query).sort()).toEqual([
-      "adminSessions", "education", "experience", "loginAttempts", "messages",
+      "adminAccount", "adminSessions", "education", "experience", "loginAttempts", "messages",
       "profile", "projects", "siteSettings", "siteState", "skills",
     ]);
     expect(db.select().from(projects).toSQL().sql).toContain('from "projects"');

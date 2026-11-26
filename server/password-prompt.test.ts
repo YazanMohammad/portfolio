@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { expect, it, vi } from "vitest";
-import { askHidden, PromptCancelled } from "./password-prompt";
+import { askHidden, askVisible, PromptCancelled } from "./password-prompt";
 
 function fakeStdin(options: { failOn?: "setEncoding" | "on" | "resume" } = {}) {
   const emitter = new EventEmitter();
@@ -86,4 +86,23 @@ it("ignores input after the answer is done", async () => {
   stdin.emit("data", "ab\rcd\u0003");
   await expect(answer).resolves.toBe("ab");
   expect(modes).toEqual([true, false]);
+});
+
+it("askVisible echoes typed characters, handles Backspace and restores raw mode", async () => {
+  const { stdin, modes } = fakeStdin();
+  const out: string[] = [];
+  const pending = askVisible("Username: ", stdin, { write: (t: string) => { out.push(t); } });
+  stdin.emit("data", "admx\u007fin\r");
+  await expect(pending).resolves.toBe("admin");
+  expect(out.join("")).toBe("Username: admx\b \bin\n");
+  expectRestored(stdin, modes);
+});
+
+it("askHidden never echoes", async () => {
+  const { stdin } = fakeStdin();
+  const out: string[] = [];
+  const pending = askHidden("Password: ", stdin, { write: (t: string) => { out.push(t); } });
+  stdin.emit("data", "secret\r");
+  await expect(pending).resolves.toBe("secret");
+  expect(out.join("")).toBe("Password: \n");
 });

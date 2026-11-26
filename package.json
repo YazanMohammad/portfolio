@@ -17,7 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:test": "drizzle-kit migrate --config drizzle.test.config.ts",
     "db:seed": "tsx db/seed.ts",
-    "admin:hash": "tsx server/bin/hash-password.ts"
+    "admin:create": "tsx server/bin/admin-account.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

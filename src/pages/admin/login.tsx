@@ -23,6 +23,7 @@ export default function AdminLogin() {
   const queryClient = useQueryClient();
   const me = useAuthMe();
   const login = useLogin();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +43,7 @@ export default function AdminLogin() {
     e.preventDefault();
     setError(null);
     login.mutate(
-      { password },
+      { username, password },
       {
         onSuccess: () => {
           queryClient.setQueryData(["auth", "me"], { authenticated: true });
@@ -53,7 +54,7 @@ export default function AdminLogin() {
             err instanceof ApiRequestError && err.status === 429
               ? slowDownMessage(err.retryAfter)
               : err instanceof ApiRequestError && err.status === 401
-                ? "Wrong password."
+                ? "Wrong username or password."
                 : "Could not log in. Try again.",
           );
           setPassword("");
@@ -75,6 +76,22 @@ export default function AdminLogin() {
         <p className="admin-field-hint">Sign in to update your work and read your messages.</p>
         <div role="alert" className="min-h-5 text-sm text-destructive" id="login-message">
           {message}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            aria-invalid={error ? true : undefined}
+            aria-describedby="login-message"
+            required
+            className="h-9"
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>

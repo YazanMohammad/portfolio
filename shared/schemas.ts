@@ -110,5 +110,13 @@ export const MessagePatch = z.object({
 });
 export type MessagePatch = z.infer<typeof MessagePatch>;
 
-export const LoginInput = z.object({ password: z.string().min(1).max(200) });
+// Login accepts any bounded username: rules are not revealed, every mismatch is the same 401.
+export const LoginInput = z.object({ username: z.string().min(1).max(200), password: z.string().min(1).max(200) });
 export type LoginInput = z.infer<typeof LoginInput>;
+
+// The admin account (admin:create CLI and the Account page). Passwords are kept as typed
+// (no trim); length counts characters, not UTF-16 units.
+export const ADMIN_PASSWORD_MIN = 12;
+export const AdminUsername = z.string().trim().min(3, "Use 3 to 64 characters.").max(64, "Use 3 to 64 characters.");
+export const AdminPassword = z.string().max(200, "Use at most 200 characters.")
+  .refine((value) => [...value].length >= ADMIN_PASSWORD_MIN, `Use at least ${ADMIN_PASSWORD_MIN} characters.`);

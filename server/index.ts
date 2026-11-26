@@ -5,6 +5,7 @@ export * from "./mappers";
 export * from "./cache";
 export * from "./handlers";
 export * from "./password";
+export * from "./admin-account";
 export * from "./ip";
 export * from "./rate-limit";
 export * from "./origin";

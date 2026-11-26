@@ -1,4 +1,4 @@
-type EnvName = "DATABASE_URL" | "ADMIN_PASSWORD_HASH" | "SESSION_SECRET" | "SITE_ORIGIN";
+type EnvName = "DATABASE_URL" | "SESSION_SECRET" | "SITE_ORIGIN";
 
 export function env(name: EnvName): string {
   const value = process.env[name];

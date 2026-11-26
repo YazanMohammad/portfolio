@@ -7,7 +7,7 @@ const P = 1;
 const SALT_BYTES = 16;
 const KEY_BYTES = 64;
 
-// Upper bounds so a bad ADMIN_PASSWORD_HASH value cannot hang or crash the function.
+// Upper bounds so a bad stored hash cannot hang or crash the function.
 const MAX_N = 2 ** 17;
 const MAX_R = 32;
 const MAX_P = 16;

@@ -4,14 +4,14 @@ import { adminSessions } from "../../db/schema";
 import login from "../../netlify/functions/auth-login";
 import logout from "../../netlify/functions/auth-logout";
 import me from "../../netlify/functions/auth-me";
-import { call, resetDb, TEST_PASSWORD } from "./helpers";
+import { call, createTestAdmin, resetDb, TEST_PASSWORD, TEST_USERNAME } from "./helpers";
 import { describeDb } from "./describe-db";
 
 // OWED-DB: run only after an isolated disposable branch is independently verified.
 describeDb("auth (real db)", () => {
-  beforeEach(resetDb);
-  const signIn = (password = TEST_PASSWORD, ip = "203.0.113.10", cookie?: string) => call(login, {
-    method: "POST", path: "/api/auth/login", json: { password }, ip, cookie,
+  beforeEach(async () => { await resetDb(); await createTestAdmin(); });
+  const signIn = (password = TEST_PASSWORD, ip = "203.0.113.10", cookie?: string, username = TEST_USERNAME) => call(login, {
+    method: "POST", path: "/api/auth/login", json: { username, password }, ip, cookie,
   });
   const getMe = (cookie?: string) => call(me, { path: "/api/auth/me", cookie });
   async function signedIn() {
@@ -27,9 +27,22 @@ describeDb("auth (real db)", () => {
   it("wrong password is 401 after at least 500ms", async () => {
     const started = performance.now(); const response = await signIn("wrong");
     expect(performance.now() - started).toBeGreaterThanOrEqual(500);
-    expect(response.status).toBe(401); expect((await response.json()).error.message).toBe("Wrong password.");
+    expect(response.status).toBe(401); expect((await response.json()).error.message).toBe("Wrong username or password.");
   });
-  it.each([{}, [], { password: 5 }, { password: TEST_PASSWORD, extra: true }, { password: "" }])("invalid input %j is 400", async json => {
+  it("wrong username is the same generic 401 after at least 500ms", async () => {
+    const started = performance.now(); const response = await signIn(TEST_PASSWORD, "203.0.113.10", undefined, "someone-else");
+    expect(performance.now() - started).toBeGreaterThanOrEqual(500);
+    expect(response.status).toBe(401); expect((await response.json()).error.message).toBe("Wrong username or password.");
+  });
+  it("username is case-insensitive and trimmed", async () => {
+    expect((await signIn(TEST_PASSWORD, "203.0.113.10", undefined, "  TEST-Admin ")).status).toBe(204);
+  });
+  it("wrong usernames count toward the rate limit too", async () => {
+    for (let i = 0; i < 5; i++) expect((await signIn(TEST_PASSWORD, "203.0.113.11", undefined, "nobody")).status).toBe(401);
+    expect((await signIn(TEST_PASSWORD, "203.0.113.11")).status).toBe(429);
+  });
+  it.each([{}, [], { password: TEST_PASSWORD }, { username: TEST_USERNAME, password: 5 },
+    { username: TEST_USERNAME, password: TEST_PASSWORD, extra: true }, { username: TEST_USERNAME, password: "" }])("invalid input %j is 400", async json => {
     expect((await call(login, { method: "POST", path: "/api/auth/login", json })).status).toBe(400);
   });
   it.each(["", "{bad"])("invalid JSON %j is 400", async body => {
@@ -42,17 +55,16 @@ describeDb("auth (real db)", () => {
     expect((await signIn(TEST_PASSWORD, "203.0.113.12")).status).toBe(204);
   });
   it("foreign login origin is forbidden", async () => {
-    expect((await call(login, { method: "POST", path: "/api/auth/login", json: { password: TEST_PASSWORD }, origin: "https://foreign.test" })).status).toBe(403);
+    expect((await call(login, { method: "POST", path: "/api/auth/login", json: { username: TEST_USERNAME, password: TEST_PASSWORD }, origin: "https://foreign.test" })).status).toBe(403);
   });
-  it.each([undefined, "bad-config"])("missing or malformed hash %s returns 401", async value => {
-    const previous = process.env.ADMIN_PASSWORD_HASH;
+  it("no admin account: generic 401 and one log line without secrets", async () => {
+    await resetDb();
+    const diagnostic = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
-      if (value === undefined) delete process.env.ADMIN_PASSWORD_HASH; else process.env.ADMIN_PASSWORD_HASH = value;
-      const diagnostic = vi.spyOn(console, "error").mockImplementation(() => {});
       const response = await signIn(); expect(response.status).toBe(401);
-      expect((await response.json()).error.message).toBe("Wrong password.");
-      diagnostic.mockRestore();
-    } finally { if (previous === undefined) delete process.env.ADMIN_PASSWORD_HASH; else process.env.ADMIN_PASSWORD_HASH = previous; vi.restoreAllMocks(); }
+      expect((await response.json()).error.message).toBe("Wrong username or password.");
+      expect(JSON.stringify(diagnostic.mock.calls)).not.toContain(TEST_PASSWORD);
+    } finally { vi.restoreAllMocks(); }
   });
   it("me without cookie is 401", async () => { expect((await getMe()).status).toBe(401); });
   it("me with cookie is authenticated", async () => {

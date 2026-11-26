@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import * as shared from "./index";
 import type { ZodTypeAny } from "zod";
-import { ProfileInput, ProjectInput, ExperienceInput, EducationInput, SkillInput, ReorderInput, MessageInput, MessagePatch, LoginInput } from "./schemas";
+import { ProfileInput, ProjectInput, ExperienceInput, EducationInput, SkillInput, ReorderInput, MessageInput, MessagePatch, LoginInput, AdminUsername, AdminPassword } from "./schemas";
 import { yearMonth, fileKey, slug, url } from "./primitives";
 
 describe("shared contract exports", () => {
@@ -16,7 +16,7 @@ describe("shared contract exports", () => {
   });
   it("re-exports all schemas and primitives", () => {
     for (const name of ["ProfileInput", "ProjectInput", "ExperienceInput", "EducationInput", "SkillInput",
-      "ReorderInput", "MessageInput", "MessagePatch", "LoginInput", "yearMonth", "fileKey", "slug", "url"] as const) {
+      "ReorderInput", "MessageInput", "MessagePatch", "LoginInput", "AdminUsername", "AdminPassword", "yearMonth", "fileKey", "slug", "url"] as const) {
       expect(shared[name].safeParse).toBeTypeOf("function");
     }
   });
@@ -69,7 +69,7 @@ describe("shared contract exports", () => {
     expectTypeOf<shared.MessageInput>().toEqualTypeOf<{ name: string; email: string; subject?: string | null; message: string; website: "" }>();
     expectTypeOf<shared.MessagePatch>().toEqualTypeOf<{ isRead?: boolean; archived?: boolean }>();
     expectTypeOf<shared.ReorderInput>().toEqualTypeOf<{ ids: number[] }>();
-    expectTypeOf<shared.LoginInput>().toEqualTypeOf<{ password: string }>();
+    expectTypeOf<shared.LoginInput>().toEqualTypeOf<{ username: string; password: string }>();
   });
 });
 
@@ -122,10 +122,27 @@ describe("messages, login and reorder", () => {
     rejectsAt(MessagePatch, { archived: "true" }, "archived");
   });
   it("limits passwords without changing their contents", () => {
-    rejectsAt(LoginInput, { password: "" }, "password");
-    rejectsAt(LoginInput, { password: "x".repeat(201) }, "password");
-    expect(LoginInput.parse({ password: "x".repeat(200) }).password).toHaveLength(200);
-    expect(LoginInput.parse({ password: " secret " }).password).toBe(" secret ");
+    const login = (password: string) => ({ username: "admin", password });
+    rejectsAt(LoginInput, login(""), "password");
+    rejectsAt(LoginInput, login("x".repeat(201)), "password");
+    expect(LoginInput.parse(login("x".repeat(200))).password).toHaveLength(200);
+    expect(LoginInput.parse(login(" secret ")).password).toBe(" secret ");
+  });
+  it("requires a bounded login username", () => {
+    rejectsAt(LoginInput, { username: "", password: "p" }, "username");
+    rejectsAt(LoginInput, { username: "x".repeat(201), password: "p" }, "username");
+    rejectsAt(LoginInput, { password: "p" }, "username");
+  });
+  it("admin username is trimmed and 3-64 characters", () => {
+    expect(AdminUsername.parse("  Yazan ")).toBe("Yazan");
+    for (const bad of ["", "ab", "  ab  ", "x".repeat(65)]) expect(AdminUsername.safeParse(bad).success, bad).toBe(false);
+    expect(AdminUsername.parse("abc")).toBe("abc");
+    expect(AdminUsername.parse("x".repeat(64))).toHaveLength(64);
+  });
+  it("admin password needs at least 12 characters and is kept as typed", () => {
+    expect(AdminPassword.safeParse("x".repeat(11)).success).toBe(false);
+    expect(AdminPassword.safeParse("x".repeat(201)).success).toBe(false);
+    expect(AdminPassword.parse(" twelve chars")).toBe(" twelve chars");
   });
   it("requires non-empty unique bounded positive integer reorder IDs", () => {
     for (const ids of [[], [1, 1], Array.from({ length: 201 }, (_, i) => i + 1)]) rejectsAt(ReorderInput, { ids }, "ids");

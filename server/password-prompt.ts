@@ -1,4 +1,4 @@
-// Hidden password prompt for a terminal. Raw mode, no echo.
+// Terminal prompts in raw mode: askHidden (no echo, for passwords) and askVisible (echo).
 // Enter ends, Backspace deletes, Ctrl+C or Ctrl+D cancels.
 // Whatever happens (success, cancel, stream error, end, setup failure) the terminal mode is put back.
 
@@ -25,6 +25,15 @@ export type PromptInput = {
 export type PromptOutput = { write(text: string): unknown };
 
 export function askHidden(prompt: string, input: PromptInput, output: PromptOutput): Promise<string> {
+  return ask(prompt, input, output, false);
+}
+
+// Same as askHidden, but echoes what is typed (for a username).
+export function askVisible(prompt: string, input: PromptInput, output: PromptOutput): Promise<string> {
+  return ask(prompt, input, output, true);
+}
+
+function ask(prompt: string, input: PromptInput, output: PromptOutput, echo: boolean): Promise<string> {
   return new Promise((resolve, reject) => {
     const wasRaw = input.isRaw === true;
     let value = "";
@@ -52,8 +61,13 @@ export function askHidden(prompt: string, input: PromptInput, output: PromptOutp
         if (settled) return;
         if (ch === "\u0003" || ch === "\u0004") finish(new PromptCancelled());
         else if (ch === "\r" || ch === "\n") finish(null);
-        else if (ch === "\u007f" || ch === "\b") value = [...value].slice(0, -1).join("");
-        else if (ch >= " ") value += ch;
+        else if (ch === "\u007f" || ch === "\b") {
+          if (echo && value !== "") output.write("\b \b");
+          value = [...value].slice(0, -1).join("");
+        } else if (ch >= " ") {
+          value += ch;
+          if (echo) output.write(ch);
+        }
       }
     };
     const onError = () => finish(new Error("Could not read input."));

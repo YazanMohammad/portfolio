@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "../../db/client";
 import {
-  adminSessions, education, experience, loginAttempts, messages, profile, projects, siteState, skills,
+  adminAccount, adminSessions, education, experience, loginAttempts, messages, profile, projects, siteState, skills,
 } from "../../db/schema";
 import { runSeed } from "../../db/seed";
 import { CV_SOURCE_URL, seedEducation, seedExperience, seedProfile, seedProjects, seedSkills } from "../../db/seed-data";
@@ -98,7 +98,9 @@ describeDb("seed script (real db)", () => {
     await db.insert(messages).values({ name: "A", email: "a@example.com", message: "hi" });
     await db.insert(loginAttempts).values({ ipHash: "h", success: false });
     await createSession();
+    await db.insert(adminAccount).values({ id: 1, username: "admin", passwordHash: "scrypt$kept" });
     await runSeed({ force: true, ...seedOptions });
+    expect(await db.select().from(adminAccount)).toMatchObject([{ username: "admin", passwordHash: "scrypt$kept" }]);
     expect((await db.select().from(profile))[0].name).toBe("Yazan Mohammad");
     expect([await rows(experience), await rows(education), await rows(projects), await rows(skills)]).toEqual([3, 1, 3, 30]);
     expect(await rows(messages)).toBe(1);
@@ -109,6 +111,15 @@ describeDb("seed script (real db)", () => {
     expect((await db.select().from(experience)).some((r) => r.position === "Changed")).toBe(false);
     expect((await db.select().from(education)).some((r) => r.degree === "Changed")).toBe(false);
     expect((await db.select().from(messages))[0].message).toBe("hi");
+  });
+
+  it("a plain run ignores the admin account (not content) and never seeds one", async () => {
+    expect(await runSeed({ force: false, ...seedOptions })).toEqual({ skipped: false });
+    expect(await rows(adminAccount)).toBe(0);
+    await resetDb();
+    await db.insert(adminAccount).values({ id: 1, username: "admin", passwordHash: "scrypt$kept" });
+    expect(await runSeed({ force: false, ...seedOptions })).toEqual({ skipped: false });
+    expect(await db.select().from(adminAccount)).toMatchObject([{ username: "admin", passwordHash: "scrypt$kept" }]);
   });
 
   it("a plain run refuses when any content table has a row and deletes nothing", async () => {

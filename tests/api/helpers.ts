@@ -4,8 +4,11 @@ import { vi } from "vitest";
 import { assertSafeReset } from "./db-safety";
 import { db, assertDatabaseBinding } from "../../db/client";
 import { education, experience, profile, projects, skills } from "../../db/schema";
+import { adminAccount } from "../../db/schema";
+import { hashPassword } from "../../server/password";
 import { cookieName, createSession } from "../../server/sessions";
 
+export const TEST_USERNAME = "test-admin";
 export const TEST_PASSWORD = "test-password-only";
 export const blobStore = new Map<string, { data: ArrayBuffer; metadata: Record<string, unknown> }>();
 export const purgeSpy = vi.fn();
@@ -34,9 +37,16 @@ export async function resetDb(): Promise<void> {
   assertSafeReset(process.env);
   assertDatabaseBinding(process.env.DATABASE_URL_TEST!);
   await db.execute(sql`TRUNCATE TABLE profile, projects, experience, education, skills, messages,
-    login_attempts, admin_sessions, site_state, site_settings RESTART IDENTITY CASCADE`);
+    login_attempts, admin_sessions, admin_account, site_state, site_settings RESTART IDENTITY CASCADE`);
   blobStore.clear();
   purgeSpy.mockReset();
+}
+
+// The admin account row for TEST_USERNAME / TEST_PASSWORD (hashed once per file).
+let testHash: Promise<string> | undefined;
+export async function createTestAdmin(username = TEST_USERNAME): Promise<void> {
+  testHash ??= hashPassword(TEST_PASSWORD);
+  await db.insert(adminAccount).values({ id: 1, username, passwordHash: await testHash });
 }
 
 export async function loginCookie(): Promise<string> {

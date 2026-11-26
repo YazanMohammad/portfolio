@@ -1,8 +1,16 @@
 // Needs the backend: run `netlify dev` first (baseURL http://localhost:8888).
-// Also needs E2E_ADMIN_PASSWORD; skipped without it.
+// Also needs E2E_ADMIN_USERNAME and E2E_ADMIN_PASSWORD; skipped without them.
 import { test, expect } from "@playwright/test";
 
-test.skip(!process.env.E2E_ADMIN_PASSWORD, "needs E2E_ADMIN_PASSWORD");
+test.skip(!process.env.E2E_ADMIN_USERNAME || !process.env.E2E_ADMIN_PASSWORD, "needs E2E_ADMIN_USERNAME and E2E_ADMIN_PASSWORD");
+
+async function logIn(page: import("@playwright/test").Page) {
+  await page.goto("/admin");
+  await page.getByLabel("Username").fill(process.env.E2E_ADMIN_USERNAME!);
+  await page.getByLabel("Password").fill(process.env.E2E_ADMIN_PASSWORD!);
+  await page.getByLabel("Password").press("Enter");
+  await expect(page).toHaveURL(/\/admin\/dashboard$/);
+}
 test.describe.configure({ mode: "serial" });
 
 async function expectSummaryEventually(page: import("@playwright/test").Page, url: string, text: string) {
@@ -14,7 +22,7 @@ async function expectSummaryEventually(page: import("@playwright/test").Page, ur
 
 test("site text, tone and preview save through the new admin", async ({page})=>{
  test.setTimeout(180_000);
- await page.goto('/admin');await page.getByLabel('Password').fill(process.env.E2E_ADMIN_PASSWORD!);await page.getByLabel('Password').press('Enter');await expect(page).toHaveURL(/\/admin\/dashboard$/);
+ await logIn(page);
  const original=await (await page.request.get('/api/admin/settings')).json();
  const heading=`Smoke work ${Date.now()}`;
  try {
@@ -52,10 +60,7 @@ test("admin edits, public reflects, contact message round trip", async ({ page, 
   const summary = `Smoke test ${stamp}`;
 
   // 1. login
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(process.env.E2E_ADMIN_PASSWORD!);
-  await page.getByLabel("Password").press("Enter");
-  await expect(page).toHaveURL(/\/admin\/dashboard$/);
+  await logIn(page);
 
   // 2. edit project summary
   await page.goto("/admin/projects");

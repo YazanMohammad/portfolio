@@ -10,8 +10,9 @@ vi.mock("@/lib/api", async () => {
 });
 import { apiGet, apiSend, ApiRequestError } from "@/lib/api";
 
-async function submit(password = "hunter2") {
+async function submit(password = "hunter2", username = "admin") {
   const user = userEvent.setup();
+  await user.type(await screen.findByLabelText("Username"), username);
   const field = await screen.findByLabelText("Password");
   await user.type(field, password);
   await user.click(screen.getByRole("button", { name: "Log in" }));
@@ -25,11 +26,20 @@ describe("AdminLogin", () => {
     vi.mocked(apiGet).mockRejectedValue(new ApiRequestError("Sign in required", 401, "unauthorized"));
   });
 
-  it('wrong password shows "Wrong password."', async () => {
+  it("sends the username and password", async () => {
+    vi.mocked(apiSend).mockResolvedValue(undefined);
+    renderWithProviders(<AdminLogin />, { path: "/admin" });
+    expect(await screen.findByLabelText("Username")).toHaveAttribute("autocomplete", "username");
+    await submit("hunter2", "Yazan");
+    await waitFor(() => expect(apiSend).toHaveBeenCalledWith("POST", "/api/auth/login", { username: "Yazan", password: "hunter2" }));
+  });
+
+  it('wrong credentials show "Wrong username or password." and keep the username', async () => {
     vi.mocked(apiSend).mockRejectedValue(new ApiRequestError("no", 401, "unauthorized"));
     renderWithProviders(<AdminLogin />, { path: "/admin" });
     const field = await submit();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Wrong password.");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Wrong username or password.");
+    expect(screen.getByLabelText("Username")).toHaveValue("admin");
     await waitFor(() => expect(field).toHaveValue(""));
     expect(field).toHaveFocus();
   });

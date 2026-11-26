@@ -1,11 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  loadRootEnv: vi.fn(), hashPassword: vi.fn(async () => "test-hash"),
+  loadRootEnv: vi.fn(),
   blobStore: new Map<string, { data: ArrayBuffer; metadata: Record<string, unknown> }>(), purgeSpy: vi.fn(),
 }));
 vi.mock("../../db/load-env", () => ({ loadRootEnv: mocks.loadRootEnv }));
-vi.mock("../../server/password", () => ({ hashPassword: mocks.hashPassword }));
 vi.mock("./helpers", () => ({ TEST_PASSWORD: "test-password-only", blobStore: mocks.blobStore, purgeSpy: mocks.purgeSpy }));
 const originalPath = expect.getState().testPath;
 
@@ -22,7 +21,6 @@ beforeEach(() => {
   vi.stubEnv("DATABASE_URL", "postgres://production.invalid/db");
   vi.stubEnv("SITE_ORIGIN", "https://unchanged.test");
   vi.stubEnv("SESSION_SECRET", "unchanged");
-  vi.stubEnv("ADMIN_PASSWORD_HASH", "unchanged");
 });
 afterEach(() => {
   expect.setState({ testPath: originalPath });
@@ -43,12 +41,10 @@ describe("API harness setup without a database connection", () => {
     expect(mocks.loadRootEnv).not.toHaveBeenCalled();
     expect(process.env.DATABASE_URL).toBe("postgres://production.invalid/db");
     expect(process.env.SITE_ORIGIN).toBe("https://unchanged.test");
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it("rejects the production URL before initializing anything", async () => {
     vi.stubEnv("DATABASE_URL_TEST", process.env.DATABASE_URL);
     await expect(loadSetup()).rejects.toThrow("Refusing unsafe test database configuration.");
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it.each([undefined, "", "0", "true"])("without RUN_DB_TESTS=1 (%s) it neither loads .env nor prepares a database", async (flag) => {
     vi.stubEnv("RUN_DB_TESTS", flag);
@@ -57,12 +53,10 @@ describe("API harness setup without a database connection", () => {
     expect(mocks.loadRootEnv).not.toHaveBeenCalled();
     expect(process.env.DATABASE_URL).toBe("postgres://production.invalid/db");
     expect(process.env.SITE_ORIGIN).toBe("https://unchanged.test");
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it("fails loudly when RUN_DB_TESTS=1 but .env leaves the test URL unset", async () => {
     await expect(loadSetup()).rejects.toThrow("RUN_DB_TESTS=1 but database tests are not enabled");
     expect(mocks.loadRootEnv).toHaveBeenCalledOnce();
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it("fails loudly when .env turns the flag off (RUN_DB_TESTS=0) after the shell asked for DB tests", async () => {
     mocks.loadRootEnv.mockImplementationOnce(() => {
@@ -71,22 +65,21 @@ describe("API harness setup without a database connection", () => {
     });
     await expect(loadSetup()).rejects.toThrow("RUN_DB_TESTS=1 but database tests are not enabled");
     expect(process.env.DATABASE_URL).toBe("postgres://production.invalid/db");
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it.each(["C:/repo/server/http.test.ts", "C:\\repo\\tests\\api\\public.unit.test.ts"])("leaves %s isolated", async (path) => {
     vi.stubEnv("DATABASE_URL_TEST", process.env.DATABASE_URL);
     await loadSetup(path);
     expect(mocks.loadRootEnv).not.toHaveBeenCalled();
-    expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
   it("configures test env and shared in-memory services without opening the database", async () => {
     vi.stubEnv("DATABASE_URL_TEST", "postgres://test.invalid/db");
+    vi.stubEnv("ADMIN_PASSWORD_HASH", undefined);
     await loadSetup("C:\\repo\\tests\\api\\public.test.ts");
     expect(process.env.DATABASE_URL).toBe("postgres://test.invalid/db");
     expect(process.env.SITE_ORIGIN).toBe("https://site.test");
     expect(Buffer.from(process.env.SESSION_SECRET!, "base64")).toHaveLength(32);
-    expect(process.env.ADMIN_PASSWORD_HASH).toBe("test-hash");
-    expect(mocks.hashPassword).toHaveBeenCalledWith("test-password-only");
+    // The admin login lives in the database now: the harness sets no password env.
+    expect(process.env).not.toHaveProperty("ADMIN_PASSWORD_HASH");
     const { getStore } = await import("@netlify/blobs");
     const store = getStore("files");
     const bytes = new Uint8Array([1, 2, 3]).buffer;
