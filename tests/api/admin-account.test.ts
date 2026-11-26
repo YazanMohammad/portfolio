@@ -5,8 +5,8 @@ import account from "../../netlify/functions/admin-account";
 import login from "../../netlify/functions/auth-login";
 import me from "../../netlify/functions/auth-me";
 import { verifyPassword } from "../../server/password";
-import { cookieName, createSession } from "../../server/sessions";
-import { call, createTestAdmin, loginCookie, resetDb, TEST_PASSWORD, TEST_USERNAME } from "./helpers";
+import { cookieName } from "../../server/sessions";
+import { call, createTestAdmin, loginCookie, resetDb, testSession, TEST_PASSWORD, TEST_USERNAME } from "./helpers";
 import { describeDb } from "./describe-db";
 
 const NEW_PASSWORD = "a brand new password";
@@ -78,6 +78,7 @@ describeDb("admin account route (real db)", () => {
     const after = await stored();
     expect(after.username).toBe("New-Name");
     expect(after.passwordHash).toBe(before.passwordHash);
+    expect(after.version).toBe(before.version + 1);
     expect(after.updatedAt.getTime()).toBeGreaterThanOrEqual(before.updatedAt.getTime());
     const rotated = cookieOf(response);
     expect(rotated).not.toBe(cookie);
@@ -98,7 +99,7 @@ describeDb("admin account route (real db)", () => {
   });
 
   it("a session due for renewal still gets exactly one (the new) session cookie", async () => {
-    const old = `${cookieName()}=${(await createSession(new Date(Date.now() - 2 * 60 * 60_000))).token}`;
+    const old = `${cookieName()}=${(await testSession(new Date(Date.now() - 2 * 60 * 60_000))).token}`;
     const response = await put({ currentPassword: TEST_PASSWORD, username: TEST_USERNAME }, old);
     expect(response.status).toBe(200);
     expect(sessionCookies(response)).toHaveLength(1);

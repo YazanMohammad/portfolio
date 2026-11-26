@@ -37,7 +37,10 @@ describe("portfolio schema", () => {
     const config = getTableConfig(schema.adminAccount);
     expect(config.name).toBe("admin_account");
     const byName = Object.fromEntries(config.columns.map((column) => [column.name, column]));
-    expect(Object.keys(byName).sort()).toEqual(["id", "password_hash", "updated_at", "username"]);
+    expect(Object.keys(byName).sort()).toEqual(["id", "password_hash", "updated_at", "username", "version"]);
+    expect(byName.version.notNull).toBe(true);
+    expect(byName.version.default).toBe(1);
+    expect(getTableConfig(schema.adminSessions).columns.map((column) => column.name)).toContain("account_version");
     expect(byName.username.notNull).toBe(true);
     expect(byName.password_hash.notNull).toBe(true);
     expect(byName.updated_at.notNull).toBe(true);

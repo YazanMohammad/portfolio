@@ -28,7 +28,7 @@ env -u DATABASE_URL pnpm dev   # use this if your shell already exports DATABASE
 | `pnpm db:migrate` | Apply migrations. Uses `DATABASE_URL_UNPOOLED` |
 | `pnpm db:migrate:test` | Apply migrations to the test branch |
 | `pnpm db:seed` | Seed profile, projects and files |
-| `pnpm admin:create` | Create or replace the admin login in the database (`.env` `DATABASE_URL`). Also ends every admin session |
+| `pnpm admin:create` | Create or replace the admin login in the database (`.env` `DATABASE_URL`). Shows the target and asks for `yes` first (piped input: `pnpm admin:create -- --yes`). Ends every admin session |
 
 ## Layout
 

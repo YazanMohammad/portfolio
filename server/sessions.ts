@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { and, eq, gt, inArray, lt } from "drizzle-orm";
+import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
 import { db } from "../db/client";
 import { adminSessions } from "../db/schema";
 import { isLocalHttp } from "./env";
@@ -34,9 +34,24 @@ function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-export async function createSession(now: Date = new Date()): Promise<{ token: string; expiresAt: Date }> {
+export type NewSession = { token: string; id: string; expiresAt: Date };
+
+// A fresh random token, the hash stored as the row id, and its expiry.
+export function newSession(now: Date = new Date()): NewSession {
   const token = crypto.randomBytes(32).toString("base64url");
-  const expiresAt = new Date(now.getTime() + SESSION_MS);
+  return { token, id: hashToken(token), expiresAt: new Date(now.getTime() + SESSION_MS) };
+}
+
+const ts = (value: Date) => sql`${value.toISOString()}::timestamptz`;
+
+// The current credential version, as a subquery (NULL when there is no account row).
+export const CURRENT_ACCOUNT_VERSION = sql`(SELECT version FROM admin_account WHERE id = 1)`;
+
+// Issues a session for the credential version the caller verified. The insert happens only if
+// admin_account still has that version (one statement), so a login that verified a password which
+// was changed or reset meanwhile gets null instead of a session.
+export async function createSession(accountVersion: number, now: Date = new Date()): Promise<{ token: string; expiresAt: Date } | null> {
+  const { token, id, expiresAt } = newSession(now);
   const cutoff = new Date(now.getTime() - CLEANUP_GRACE_MS);
   // Housekeeping is bounded: at most CLEANUP_BATCH long-expired rows per login.
   const stale = db
@@ -44,11 +59,13 @@ export async function createSession(now: Date = new Date()): Promise<{ token: st
     .from(adminSessions)
     .where(lt(adminSessions.expiresAt, cutoff))
     .limit(CLEANUP_BATCH);
-  await db.batch([
-    db.insert(adminSessions).values({ id: hashToken(token), createdAt: now, expiresAt, lastSeenAt: now }),
+  const [inserted] = await db.batch([
+    db.execute(sql`INSERT INTO admin_sessions (id, created_at, expires_at, last_seen_at, account_version)
+      SELECT ${id}::text, ${ts(now)}, ${ts(expiresAt)}, ${ts(now)}, version FROM admin_account
+      WHERE id = 1 AND version = ${accountVersion}::integer RETURNING id`),
     db.delete(adminSessions).where(inArray(adminSessions.id, stale)),
   ]);
-  return { token, expiresAt };
+  return inserted.rows.length > 0 ? { token, expiresAt } : null;
 }
 
 export async function validateSession(token: string | null, now: Date = new Date()): Promise<SessionCheck> {
@@ -60,7 +77,7 @@ export async function validateSession(token: string | null, now: Date = new Date
   const [found] = await db
     .select({ lastSeenAt: adminSessions.lastSeenAt })
     .from(adminSessions)
-    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now)));
+    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now), eq(adminSessions.accountVersion, CURRENT_ACCOUNT_VERSION)));
   if (!found) return INVALID;
   if (!shouldRenew(found.lastSeenAt, now)) return { valid: true, renewed: false };
 
@@ -68,7 +85,7 @@ export async function validateSession(token: string | null, now: Date = new Date
   const renewed = await db
     .update(adminSessions)
     .set({ expiresAt: new Date(now.getTime() + SESSION_MS), lastSeenAt: now })
-    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now)))
+    .where(and(eq(adminSessions.id, id), gt(adminSessions.expiresAt, now), eq(adminSessions.accountVersion, CURRENT_ACCOUNT_VERSION)))
     .returning({ id: adminSessions.id });
   return renewed.length > 0 ? { valid: true, renewed: true } : INVALID;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import * as shared from "./index";
 import type { ZodTypeAny } from "zod";
-import { ProfileInput, ProjectInput, ExperienceInput, EducationInput, SkillInput, ReorderInput, MessageInput, MessagePatch, LoginInput, AdminUsername, AdminPassword } from "./schemas";
+import { ProfileInput, ProjectInput, ExperienceInput, EducationInput, SkillInput, ReorderInput, MessageInput, MessagePatch, LoginInput, AdminUsername, AdminPassword, foldUsername } from "./schemas";
 import { yearMonth, fileKey, slug, url } from "./primitives";
 
 describe("shared contract exports", () => {
@@ -132,6 +132,16 @@ describe("messages, login and reorder", () => {
     rejectsAt(LoginInput, { username: "", password: "p" }, "username");
     rejectsAt(LoginInput, { username: "x".repeat(201), password: "p" }, "username");
     rejectsAt(LoginInput, { password: "p" }, "username");
+  });
+  it("admin username is NFKC-normalised, trimmed, and has no control characters", () => {
+    expect(AdminUsername.parse(" ＡＤＭＩＮ ")).toBe("ADMIN");
+    expect(AdminUsername.parse("Ade\u0301le")).toBe("Ad\u00e9le");
+    expect(AdminUsername.safeParse("adm\u0000in").success).toBe(false);
+    expect(AdminUsername.safeParse("adm\u200bin").success).toBe(false);
+    expect(foldUsername("ＡＤＭＩＮ")).toBe(foldUsername("admin"));
+    expect(foldUsername("STRASSE")).toBe(foldUsername("straße"));
+    expect(foldUsername(" Ade\u0301le ")).toBe(foldUsername("AD\u00c9LE"));
+    expect(foldUsername("admin")).not.toBe(foldUsername("admín"));
   });
   it("admin username is trimmed and 3-64 characters", () => {
     expect(AdminUsername.parse("  Yazan ")).toBe("Yazan");

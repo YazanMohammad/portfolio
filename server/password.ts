@@ -55,6 +55,11 @@ function parse(stored: string): { params: Params; salt: Buffer; key: Buffer } | 
   return { params: { N: n, r, p }, salt, key };
 }
 
+// True when verifyPassword would actually run scrypt on this stored value.
+export function isPasswordHash(stored: string): boolean {
+  return typeof stored === "string" && parse(stored.trim()) !== null;
+}
+
 export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.randomBytes(SALT_BYTES);
   const key = await derive(password, salt, KEY_BYTES, { N, r: R, p: P });

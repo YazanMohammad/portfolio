@@ -102,6 +102,8 @@ export const adminSessions = pgTable("admin_sessions", {
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
   expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
   lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
+  // admin_account.version at issue time; a session is valid only while it still matches.
+  accountVersion: integer("account_version"),
 });
 
 // The one admin login (singleton). Username is stored trimmed and compared case-insensitively;
@@ -110,6 +112,9 @@ export const adminAccount = pgTable("admin_account", {
   id: integer("id").primaryKey().default(1),
   username: text("username").notNull(),
   passwordHash: text("password_hash").notNull(),
+  // Credential version: bumped by every account write. Sessions carry the version they were issued
+  // for and stop working when it changes; account writes compare-and-set on it.
+  version: integer("version").notNull().default(1),
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
 }, (table) => [check("admin_account_singleton", sql`${table.id} = 1`)]);
 

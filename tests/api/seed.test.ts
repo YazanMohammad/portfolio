@@ -13,11 +13,10 @@ import { CV_SOURCE_URL, seedEducation, seedExperience, seedProfile, seedProjects
 import content from "../../netlify/functions/content";
 import { toEducation, toExperience, educationToRow, experienceToRow, profileToRow, projectToRow, skillToRow } from "../../server/mappers";
 import { touchLastSaved } from "../../server/last-saved";
-import { createSession } from "../../server/sessions";
 import {
   EducationInput, ExperienceInput, ProfileInput, ProjectInput, SkillInput, type PublicContent,
 } from "../../shared/index";
-import { call, resetDb } from "./helpers";
+import { call, resetDb, testSession } from "./helpers";
 import { describeDb } from "./describe-db";
 
 const PDF = new TextEncoder().encode("%PDF-1.4\n%fake cv");
@@ -97,10 +96,10 @@ describeDb("seed script (real db)", () => {
     expect(await rows(siteState)).toBe(1);
     await db.insert(messages).values({ name: "A", email: "a@example.com", message: "hi" });
     await db.insert(loginAttempts).values({ ipHash: "h", success: false });
-    await createSession();
-    await db.insert(adminAccount).values({ id: 1, username: "admin", passwordHash: "scrypt$kept" });
+    await testSession();
+    const account = await db.select().from(adminAccount);
     await runSeed({ force: true, ...seedOptions });
-    expect(await db.select().from(adminAccount)).toMatchObject([{ username: "admin", passwordHash: "scrypt$kept" }]);
+    expect(await db.select().from(adminAccount)).toEqual(account);
     expect((await db.select().from(profile))[0].name).toBe("Yazan Mohammad");
     expect([await rows(experience), await rows(education), await rows(projects), await rows(skills)]).toEqual([3, 1, 3, 30]);
     expect(await rows(messages)).toBe(1);

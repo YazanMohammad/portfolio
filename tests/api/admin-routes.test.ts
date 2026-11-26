@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { count } from "drizzle-orm";
 import { db } from "../../db/client";
 import { adminAccount, adminSessions, education, experience, loginAttempts, messages, profile, projects, siteState, skills } from "../../db/schema";
-import { cookieName, createSession } from "../../server/sessions";
+import { cookieName } from "../../server/sessions";
 import { ADMIN_ROUTES, FOREIGN, READ_ROUTES, WRITE_ROUTES, errorCode, label, send } from "./admin-routes";
-import { blobStore, loginCookie, purgeSpy, resetDb, seedMinimal } from "./helpers";
+import { blobStore, loginCookie, purgeSpy, resetDb, seedMinimal, testSession } from "./helpers";
 import { describeDb } from "./describe-db";
 
 // OWED-DB: needs the isolated test database. The database-free checks live in admin-routes.unit.test.ts.
@@ -28,7 +28,7 @@ describeDb("OWED-DB admin routes (real DB)", () => {
     await seedMinimal();
     valid = await loginCookie();
     // Created 8 days ago, so it expired a day ago. Made last: a later login could clean it up.
-    expired = `${cookieName()}=${(await createSession(new Date(Date.now() - 8 * DAY))).token}`;
+    expired = `${cookieName()}=${(await testSession(new Date(Date.now() - 8 * DAY))).token}`;
   });
 
   it.each(ADMIN_ROUTES.map(route => [label(route), route] as const))("expired session -> 401: %s", async (_name, route) => {

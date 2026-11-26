@@ -74,9 +74,12 @@ own computer, after the migration:
    ```
 
    (`pnpm admin:create` does the same if pnpm is on your PATH.)
-3. Type a username (3 to 64 characters), then the password twice (at least 12 characters; nothing
+3. It first shows the database it will write to (host and database name only) and whether that is
+   the `DATABASE_URL_TEST` host. For production it must say the main branch host and
+   `Matches DATABASE_URL_TEST host: no`. Type `yes` to continue; anything else stops without changes.
+4. Type a username (3 to 64 characters), then the password twice (at least 12 characters; nothing
    shows while you type). It prints `Admin account saved.`
-4. Log in at `https://www.yznmoh.com/admin` with that username (case does not matter) and password.
+5. Log in at `https://www.yznmoh.com/admin` with that username (case does not matter) and password.
 
 You can change the username or password later on the admin **Account** page. Saving there logs out
 every other browser.

@@ -49,8 +49,22 @@ export async function createTestAdmin(username = TEST_USERNAME): Promise<void> {
   await db.insert(adminAccount).values({ id: 1, username, passwordHash: await testHash });
 }
 
+// Sessions are bound to the account's credential version, so a session needs an account row.
+export async function ensureTestAdmin(): Promise<number> {
+  testHash ??= hashPassword(TEST_PASSWORD);
+  await db.insert(adminAccount).values({ id: 1, username: TEST_USERNAME, passwordHash: await testHash }).onConflictDoNothing();
+  const [row] = await db.select({ version: adminAccount.version }).from(adminAccount);
+  return row.version;
+}
+
+export async function testSession(now: Date = new Date()): Promise<{ token: string; expiresAt: Date }> {
+  const session = await createSession(await ensureTestAdmin(), now);
+  if (!session) throw new Error("Test session was not created.");
+  return session;
+}
+
 export async function loginCookie(): Promise<string> {
-  const { token } = await createSession();
+  const { token } = await testSession();
   return `${cookieName()}=${token}`;
 }
 

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ reserve: vi.fn(), success: vi.fn(), verify: vi.fn(), create: vi.fn(), remove: vi.fn(), select: vi.fn() }));
 vi.mock("../../db/client", () => ({ db: { select: mocks.select } }));
 vi.mock("../../server/rate-limit", () => ({ reserveLoginAttempt: mocks.reserve, markLoginSuccess: mocks.success }));
-vi.mock("../../server/password", () => ({ verifyPassword: mocks.verify }));
+vi.mock("../../server/password", async (original) => ({ ...await original<typeof import("../../server/password")>(), verifyPassword: mocks.verify }));
 vi.mock("../../server/sessions", async (original) => ({ ...await original<typeof import("../../server/sessions")>(), createSession: mocks.create, deleteSession: mocks.remove }));
 import login, { loginDelayMs } from "../../netlify/functions/auth-login";
 import { DUMMY_HASH } from "../../server/admin-account";
@@ -52,8 +52,10 @@ it("me POST and logout GET return 404 before authentication", async () => {
 
 const ctx = { ip: "203.0.113.10" } as Context;
 const token = "n".repeat(43);
-const ACCOUNT = { username: "Admin", passwordHash: "configured" };
-let accountRows: { username: string; passwordHash: string }[] = [ACCOUNT];
+// A well-formed stored hash (format only; verifyPassword is mocked).
+const CONFIGURED = `scrypt$16384$8$1$${Buffer.alloc(16, 1).toString("base64")}$${Buffer.alloc(64, 2).toString("base64")}`;
+const ACCOUNT = { username: "Admin", passwordHash: CONFIGURED, version: 3 };
+let accountRows: { username: string; passwordHash: string; version: number }[] = [ACCOUNT];
 function request(body: unknown = { username: "admin", password: "right" }, method = "POST", origin = "https://site.test", cookie?: string) {
   const headers = new Headers({ Origin: origin, "Content-Type": "application/json" });
   if (cookie) headers.set("Cookie", cookie);
@@ -75,9 +77,10 @@ it("reserves then verifies, marks success, deletes old cookie before creating a 
   expect(response.headers.get("Set-Cookie")).toBe(`__Host-session=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`);
   const hash = hashIp(ctx.ip);
   expect(mocks.reserve).toHaveBeenCalledWith(hash); expect(mocks.success).toHaveBeenCalledWith(hash, 17);
-  expect(mocks.verify).toHaveBeenCalledOnce(); expect(mocks.verify).toHaveBeenCalledWith("right", "configured");
+  expect(mocks.verify).toHaveBeenCalledOnce(); expect(mocks.verify).toHaveBeenCalledWith("right", CONFIGURED);
   expect(mocks.remove).toHaveBeenCalledWith("o".repeat(43));
-  const order = [mocks.reserve, mocks.verify, mocks.success, mocks.remove, mocks.create].map(fn => fn.mock.invocationCallOrder[0]);
+  expect(mocks.create).toHaveBeenCalledWith(3);
+  const order = [mocks.reserve, mocks.verify, mocks.remove, mocks.create, mocks.success].map(fn => fn.mock.invocationCallOrder[0]);
   expect(order).toEqual([...order].sort((a, b) => a - b));
 });
 it("successful login without an old cookie creates a session without deleting or logging secrets", async () => {
@@ -89,7 +92,7 @@ it("successful login without an old cookie creates a session without deleting or
 });
 it.each(["ADMIN", "  admin  ", "Admin"])("username %j matches case-insensitively after trimming", async (username) => {
   expect((await login(request({ username, password: "right" }), ctx)).status).toBe(204);
-  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", "configured");
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", CONFIGURED);
 });
 it("wrong username still runs one scrypt verify, against the dummy hash, and gets the generic 401", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
@@ -102,8 +105,20 @@ it("wrong password runs one verify against the stored hash and gets the generic 
   mocks.verify.mockResolvedValue(false);
   const response = await login(request(), ctx);
   expect(response.status).toBe(401); expect(await response.json()).toEqual(WRONG);
-  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", "configured");
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", CONFIGURED);
   expect(mocks.success).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
+});
+it("credentials changed between verify and session creation: generic 401, no success mark", async () => {
+  mocks.create.mockResolvedValue(null);
+  const response = await login(request(), ctx);
+  expect(response.status).toBe(401); expect(await response.json()).toEqual(WRONG);
+  expect(response.headers.get("Set-Cookie")).toBeNull();
+  expect(mocks.success).not.toHaveBeenCalled();
+});
+it.each([["ＡＤＭＩＮ", "admin"], ["Ade\u0301le", "ad\u00e9le"], ["STRASSE", "straße"]])("username %j matches stored %j (NFKC + case fold)", async (given, storedName) => {
+  accountRows = [{ ...ACCOUNT, username: storedName }];
+  expect((await login(request({ username: given, password: "right" }), ctx)).status).toBe(204);
+  expect(mocks.verify).toHaveBeenCalledExactlyOnceWith("right", CONFIGURED);
 });
 it("the dummy hash is a well-formed scrypt hash, so the no-match path does full scrypt work", () => {
   expect(DUMMY_HASH).toMatch(/^scrypt\$16384\$8\$1\$[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}$/);
@@ -131,7 +146,7 @@ it.each(["wrong password", "wrong username", "no account", "malformed stored has
   if (kind === "wrong username") body = { username: "nobody", password: "right" };
   if (kind === "no account") accountRows = [];
   if (kind === "malformed stored hash") {
-    accountRows = [{ username: "Admin", passwordHash: "malformed-secret-do-not-log" }];
+    accountRows = [{ username: "Admin", passwordHash: "malformed-secret-do-not-log", version: 1 }];
     const real = await vi.importActual<typeof import("../../server/password")>("../../server/password");
     mocks.verify.mockImplementation(real.verifyPassword);
   }

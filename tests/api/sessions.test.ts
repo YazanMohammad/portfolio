@@ -6,7 +6,8 @@ import { db } from "../../db/client";
 import { adminSessions } from "../../db/schema";
 import { adminHandler } from "../../server/handlers";
 import { json } from "../../server/http";
-import { createSession, deleteSession, requireAdmin, validateSession } from "../../server/sessions";
+import { deleteSession, requireAdmin, validateSession } from "../../server/sessions";
+import { testSession } from "./helpers";
 import { describeDb } from "./describe-db";
 
 // Runs only against the Neon test branch. Task 10 fills tests/api/setup.ts.
@@ -23,7 +24,7 @@ function sha256(token: string): string {
 }
 
 async function fresh(now = new Date()) {
-  const session = await createSession(now);
+  const session = await testSession(now);
   used.push(sha256(session.token));
   return session;
 }

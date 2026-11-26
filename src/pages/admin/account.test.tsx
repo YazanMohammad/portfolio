@@ -97,6 +97,16 @@ describe("AdminAccount", () => {
     expect(screen.getByLabelText(/^Current password/)).toHaveValue("");
   });
 
+  it("a stale save (409) shows the reload message and stays on the page", async () => {
+    vi.mocked(apiSend).mockRejectedValue(new ApiRequestError("Your account changed. Reload and try again.", 409, "conflict"));
+    const { user, location } = setup();
+    await fill(user, { username: "Admin2", current: CURRENT });
+    await save(user);
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts.map((a) => a.textContent).join(" ")).toContain("Your account changed. Reload and try again.");
+    expect(location()).toBe("/admin/account");
+  });
+
   it("too many wrong attempts shows the slow-down message", async () => {
     vi.mocked(apiSend).mockRejectedValue(new ApiRequestError("slow", 429, "rate_limited", undefined, 120));
     const { user } = setup();

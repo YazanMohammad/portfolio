@@ -117,7 +117,19 @@ export type LoginInput = z.infer<typeof LoginInput>;
 // The admin account (admin:create CLI and the Account page). Passwords are kept as typed
 // (no trim); length counts characters, not UTF-16 units.
 export const ADMIN_PASSWORD_MIN = 12;
-export const AdminUsername = z.string().trim().min(3, "Use 3 to 64 characters.").max(64, "Use 3 to 64 characters.");
+// Usernames: NFKC-normalised and trimmed before validation and storage (full-width and decomposed
+// forms become their usual characters), no control or format characters, 3-64 characters.
+// Logins compare foldUsername() of both sides, so case never matters.
+export function normalizeUsername(value: string): string {
+  return value.normalize("NFKC").trim();
+}
+export function foldUsername(value: string): string {
+  // Upper then lower approximates Unicode case folding (e.g. "ß" and "SS" both become "ss").
+  return normalizeUsername(value).toUpperCase().toLowerCase().normalize("NFKC");
+}
+export const AdminUsername = z.string().transform(normalizeUsername).pipe(z.string()
+  .min(3, "Use 3 to 64 characters.").max(64, "Use 3 to 64 characters.")
+  .regex(/^[^\p{Cc}\p{Cf}]*$/u, "Use letters, digits and symbols only."));
 export const AdminPassword = z.string().max(200, "Use at most 200 characters.")
   .refine((value) => [...value].length >= ADMIN_PASSWORD_MIN, `Use at least ${ADMIN_PASSWORD_MIN} characters.`);
 

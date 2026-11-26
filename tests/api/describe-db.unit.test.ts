@@ -36,7 +36,7 @@ describe("database test opt-in", () => {
     const { fileURLToPath } = await import("node:url");
     const dir = fileURLToPath(new URL("./", import.meta.url));
     const suites = readdirSync(dir).filter(name => name.endsWith(".test.ts") && !name.endsWith(".unit.test.ts")).sort();
-    expect(suites).toEqual(["admin-account-cli", "admin-account", "admin-collection", "admin-files", "admin-messages", "admin-profile", "admin-routes",
+    expect(suites).toEqual(["admin-account-cli", "admin-account-race", "admin-account", "admin-collection", "admin-files", "admin-messages", "admin-profile", "admin-routes",
       "admin-settings", "admin-summary", "auth", "messages", "public", "rate-limit", "seed", "sessions"].map(name => `${name}.test.ts`));
     for (const name of suites) {
       const source = readFileSync(dir + name, "utf8");
