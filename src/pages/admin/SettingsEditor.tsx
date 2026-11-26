@@ -67,7 +67,7 @@ export function SettingsEditor({mode}:{mode:"copy"|"theme"}) {
   }catch(error){if(error instanceof ApiRequestError){setErrors(error.fields ?? {});setFormError(error.message);}else setFormError("Could not save. Try again.");}
   finally{setSaving(false);}
  }
- if(query.isPending)return <p>Loading…</p>;
+ if(query.isPending)return <p role="status">Loading…</p>;
  if(!query.data)return <p role="alert">Could not load settings. Reload the page to try again.</p>;
  const errorFor=(key:string)=>errors[`${mode}.${key}`];
  const changed=(key:string)=>Boolean(String(draft[key]??"").trim() && draft[key]!==defaults[key]);

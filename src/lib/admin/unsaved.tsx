@@ -41,6 +41,7 @@ export function UnsavedProvider({ children }: { children: ReactNode }) {
   const ids = useRef(new Set<string>());
   const [dirtyCount, setDirtyCount] = useState(0);
   const [pending, setPending] = useState<(() => void) | null>(null);
+  const pendingRef = useRef(false);
   const opener = useRef<HTMLElement | null>(null);
   const saver = useRef<{ fn: () => void; enabled: boolean } | null>(null);
   const [status, setStatus] = useState("");
@@ -93,6 +94,8 @@ export function UnsavedProvider({ children }: { children: ReactNode }) {
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [dirtyCount]);
+
+  pendingRef.current = pending !== null;
 
   const value = useMemo(() => ({ setDirty, run, registerSaver, dirty: dirtyCount > 0 }), [setDirty, run, registerSaver, dirtyCount]);
 

@@ -126,3 +126,29 @@ it("preview scale comes from the container width and reserves height",async()=>{
  }finally{globalThis.ResizeObserver=original;rect.mockRestore();height.mockRestore();}
  expect(previewScale(900)).toBe(0.75);
 });
+
+it("the 1200px preview stage is the cqw size container", async()=>{
+ const {readFileSync}=await import("node:fs");
+ const css=readFileSync("src/components/admin/settings.css","utf8"),admin=readFileSync("src/components/admin/admin.css","utf8");
+ renderWithProviders(<AdminLayout><Look/></AdminLayout>);
+ const preview=await screen.findByTestId("site-preview");
+ const stage=preview.querySelector<HTMLElement>(".admin-preview-stage")!;
+ expect(stage.querySelector(".site-shell")).not.toBeNull();expect(stage.style.width).toBe("1200px");
+ expect(css).toMatch(/\.admin-preview-stage\{[^}]*container-type:inline-size/);
+ expect(admin).not.toMatch(/\.admin-live-preview\s*\{[^}]*container-type/);
+ expect(admin).not.toMatch(/\.admin-live-preview\s*>\s*\.site-shell/);
+});
+
+it("rail and hero-shape selection use the admin accent-text variant with visible borders", async()=>{
+ const {readFileSync}=await import("node:fs");
+ const {contrast}=await import("@shared/palette");
+ const {adminAccentText}=await import("@/lib/admin/accent-text");
+ const css=readFileSync("src/components/admin/settings.css","utf8"),admin=readFileSync("src/components/admin/admin.css","utf8");
+ expect(css).toMatch(/\.admin-section-rail button\[aria-selected=true\]\{color:var\(--p-accent-text\)/);
+ expect(css).toMatch(/\.admin-shape:has\(input:checked\)\{[^}]*color:var\(--p-accent-text\)/);
+ expect(css).not.toMatch(/(?<![-\w])color:var\(--p-accent\)/);
+ expect(css).not.toContain("--p-on-accent");expect(admin).not.toContain("aria-pressed");
+ expect(css).toMatch(/\.admin-shape\{[^}]*border:1px solid #767676/);
+ expect(contrast("#767676","#141414")).toBeGreaterThanOrEqual(3);
+ for(let hue=0;hue<360;hue+=1)expect(contrast(adminAccentText(hue),"#141414"),`hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+});
