@@ -4,7 +4,8 @@ import {
   GraduationCap,
   LayoutDashboard,
   Mail,
-  Sparkles,
+  Palette,
+  Wrench,
   User,
   Type,
   type LucideIcon,
@@ -16,12 +17,12 @@ import { cn } from "@/lib/utils";
 const ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/site-text", label: "Site text", icon: Type },
-  { to: "/admin/look", label: "Look", icon: Sparkles },
+  { to: "/admin/look", label: "Look", icon: Palette },
   { to: "/admin/profile", label: "Profile", icon: User },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
   { to: "/admin/experience", label: "Experience", icon: Briefcase },
   { to: "/admin/education", label: "Education", icon: GraduationCap },
-  { to: "/admin/skills", label: "Skills", icon: Sparkles },
+  { to: "/admin/skills", label: "Skills", icon: Wrench },
   { to: "/admin/messages", label: "Messages", icon: Mail },
 ];
 

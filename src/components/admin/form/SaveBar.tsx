@@ -47,7 +47,7 @@ export function SaveBar({ formId, shell = false, dirty, saving, disabled = false
   useSaveShortcut(save, dirty && !saving && !disabled);
 
   const bar = (
-    <div className="admin-savebar sticky bottom-0 z-10 flex flex-wrap items-center gap-3 border-t border-border bg-card px-4 py-3">
+    <div className="admin-savebar flex flex-wrap items-center gap-3 border-t border-border bg-card px-4 py-3">
       <Button type="button" onClick={save} disabled={!dirty || saving || disabled}>
         {saving ? "Saving…" : "Save"}
       </Button>
@@ -56,7 +56,10 @@ export function SaveBar({ formId, shell = false, dirty, saving, disabled = false
           Discard changes
         </Button>
       )}
-      {dirty && <span className="text-sm text-muted-foreground">Unsaved changes</span>}
+      <span role="status" className={dirty ? "admin-save-state admin-save-state--dirty" : "admin-save-state"}>
+        {dirty && <span className="admin-dirty-dot" aria-hidden="true" />}
+        {dirty ? "Unsaved changes" : "All changes saved"}
+      </span>
       {formError && (
         <p role="alert" className="text-sm text-destructive">
           {formError}

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { disableKit } from "@/lib/admin/kit";
 import { useAuthMe, useLogin } from "@/lib/admin/queries";
 import { ApiRequestError } from "@/lib/api";
+import { useAdminTitle } from "@/components/admin/useAdminTitle";
 
 const DEFAULT_RETRY_SECONDS = 15 * 60;
 
@@ -17,6 +18,7 @@ function slowDownMessage(seconds?: number): string {
 }
 
 export default function AdminLogin() {
+  useAdminTitle("Log in · Admin");
   const [, navigate] = useLocation();
   const search = useSearch();
   const queryClient = useQueryClient();
