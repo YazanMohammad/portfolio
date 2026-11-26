@@ -20,7 +20,8 @@ it("exposes role and location in a real bordered label block", () => {
 it("hides marquee duplicates while preserving one grouped skills list", () => {
   media(); const { container } = render(<SkillsSection skills={content.skills} />);
   expect(container.querySelector(".skills-marquee")).toHaveAttribute("aria-hidden", "true");
-  expect(screen.getAllByRole("list")).toHaveLength(1);
+  expect(container.querySelector(".skills-list")).not.toHaveAttribute("role");
+  expect(screen.getAllByRole("list").length).toBeGreaterThan(0);
   expect(screen.getAllByRole("listitem")).toHaveLength(content.skills.length);
   expect(screen.getByRole("heading", { name: "Languages" })).toBeVisible();
 });

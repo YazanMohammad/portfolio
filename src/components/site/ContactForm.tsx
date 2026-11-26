@@ -85,8 +85,8 @@ export function ContactForm() {
             <label htmlFor={`${id}-website`} hidden>{siteCopy.contact.website}</label>
             <input id={`${id}-website`} name="website" tabIndex={-1} autoComplete="off" defaultValue="" />
           </div>
-          <div className="btn-row"><button className="btn btn--primary" type="submit" disabled={state === "sending"}>{state === "sending" ? siteCopy.contact.sending : siteCopy.contact.submit}</button></div>
-          <p className="form__status" role="status" data-form-status>{status}</p>
+          <div className="btn-row"><button className="btn btn--primary" type="submit" aria-disabled={state === "sending" || undefined}>{state === "sending" ? siteCopy.contact.sending : siteCopy.contact.submit}</button></div>
+          <p className="form__status" role="status" aria-live="polite" data-form-status>{status}</p>
         </div>
     </form>
   );

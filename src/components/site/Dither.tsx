@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useSiteTheme } from "@/lib/site/settings";
 import { useMedia } from "./Poster";
+import { useMotionPaused } from "./motion";
 
 /** Dot-halftone solids. Geometry is cached; only the light moves per frame. */
 export function Dither({ shape = 0, animate = false, className = "" }: { shape?: number; animate?: boolean; className?: string }) {
   const theme = useSiteTheme();
   const hidden = className.includes("section-art") && !theme.sectionShapes;
   const ref = useRef<HTMLCanvasElement>(null);
-  const reduced = useMedia("(prefers-reduced-motion: reduce)");
+  const reduced = useMedia("(prefers-reduced-motion: reduce)") || useMotionPaused();
   useEffect(() => {
     if (hidden) return;
     const canvas = ref.current;

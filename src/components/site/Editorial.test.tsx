@@ -24,7 +24,7 @@ describe("editorial public site", () => {
   it("numbers every project and gives it a title-based visual", () => {
     const {container}=render(<WorkSection projects={content.projects} />);
     expect(container.querySelectorAll(".project-entry")).toHaveLength(content.projects.length);
-    content.projects.forEach((p,i)=>{const row=container.querySelectorAll(".project-entry")[i] as HTMLElement;expect(within(row).getByText(String(i+1).padStart(2,"0"))).toBeInTheDocument();expect(within(row).getByRole("link",{name:p.title})).toHaveAttribute("href",`/projects/${p.slug}`);expect(within(row).getByRole("img",{name:p.title})).toBeInTheDocument();});
+    content.projects.forEach((p,i)=>{const row=container.querySelectorAll(".project-entry")[i] as HTMLElement;expect(within(row).getByText(String(i+1).padStart(2,"0"))).toBeInTheDocument();expect(within(row).getByRole("link",{name:p.title})).toHaveAttribute("href",`/projects/${p.slug}`);expect(row.querySelector(".type-plate")).toHaveAttribute("aria-hidden","true");});
   });
   it("typesets skills without icon tiles", () => {
     const {container}=render(<SkillsSection skills={content.skills} />);

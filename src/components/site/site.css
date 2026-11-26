@@ -122,7 +122,7 @@
 .site-shell .btn:disabled { cursor: wait; opacity: .7; }
 .site-shell .field__error { color: var(--accent); font-size: 14.4px; margin-top: 8px; }
 .site-shell .form__status { grid-column: 1 / -1; font-size: 14.4px; }
-.site-shell .form__status:empty { display: none; }
+.site-shell .form__status:empty { min-height: 0; margin: 0; overflow: hidden; }
 .site-shell .stack-6 > * + * { margin-top: 24px; }
 .site-shell .stack-4 > * + * { margin-top: 16px; }
 .site-shell .footer .stack-6 > p { font-size: 14.4px; }
@@ -205,6 +205,6 @@
  .site-shell .form .btn { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
- html { scroll-behavior: auto; }
+ html, html:focus-within { scroll-behavior: auto !important; }
  .site-shell *, .site-shell *::before, .site-shell *::after { animation: none !important; transition: none !important; }
 }
