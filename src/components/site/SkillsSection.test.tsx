@@ -18,7 +18,7 @@ describe("SkillsSection", () => {
     const { container } = render(<SkillsSection skills={[sk("A", "Langs", null), sk("B", "Tools", null), sk("C", "Langs", null)]} />);
     expect(container.querySelector("section#skills")).not.toBeNull();
     expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Langs", "Tools"]);
-    expect(screen.getAllByRole("list")).toHaveLength(1);
+    expect(screen.getAllByRole("list")).toHaveLength(2);
     expect(screen.getAllByRole("listitem").map(item => item.textContent)).toEqual(["A", "C", "B"]);
   });
   it("keeps every skill as plain text even when an icon is supplied", () => {

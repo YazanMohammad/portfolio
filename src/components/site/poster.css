@@ -20,7 +20,7 @@
 .site-shell .name-line + .name-line .name-letter { animation-delay: 100ms; }
 @keyframes grid-rise { from { transform: translateY(16%); opacity: 0; } to { transform: none; opacity: 1; } }
 .site-shell .dither { display: block; width: 100%; aspect-ratio: 1; height: auto; }
-.site-shell .hero-art { position: absolute; width: 30%; right: 0; top: -25px; }
+.site-shell .hero-art { position: absolute; width: 22%; right: -2%; top: -60px; }
 .site-shell .hero__meta.hero-label { display: flex; align-items: center; gap: 14px; border: 1px solid var(--line); width: fit-content; padding: 14px 18px; margin-top: 32px; background: var(--bg); }
 .site-shell .hero-label :is(p,span) { margin: 0; font-size: 12px; color: var(--ink); letter-spacing: .08em; text-transform: uppercase; }
 .site-shell .hero-label span { color: var(--accent); }
@@ -60,7 +60,6 @@
 .site-shell .cursor-plate.is-visible { visibility: visible; }
 .site-shell .cursor-plate .type-plate__title { font-size: 26px; }
 .site-shell .skills-band { overflow: hidden; padding-bottom: 64px; }
-.site-shell .skills-band:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 .site-shell .editorial-grid > .skills-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; grid-column: 4 / 13; }
 .site-shell .skills-list .skills__group { display: block; grid-column: auto; padding: 20px 0 0; }
 .site-shell .skills__group h3 { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
@@ -72,6 +71,9 @@
 .site-shell .skills-marquee__copy > span { white-space: nowrap; }
 .site-shell .skills-marquee i { color: var(--accent); font-style: normal; padding-inline: .5em; }
 .site-shell .skills-band:is(:hover,:focus-within) .skills-marquee__track { animation-play-state: paused; }
+.site-shell[data-motion="paused"] .skills-marquee__track { animation-play-state: paused; }
+.site-shell .nav__pause { font: 400 12px/1 var(--font-mono); color: var(--ink); background: none; border: 1px solid var(--line); padding: 10px 12px; min-height: 44px; cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }
+@media (prefers-reduced-motion: reduce) { .site-shell .nav__pause { display: none; } }
 @keyframes skills-run { to { transform: translateX(-50%); } }
 .site-shell .experience-band { background: var(--surface); }
 .site-shell .experience-band .rows__date { font: 400 13px/1.7 var(--font-mono); color: var(--muted); max-width: 18ch; }

@@ -33,7 +33,10 @@ describe("WorkSection", () => {
   it("shows a labelled stand-in without an image", () => {
     const p = make({ technologies: ["t1", "t2", "t3", "t4", "t5", "t6"] });
     render(<ProjectFrame project={p} />);
-    const frame = screen.getByRole("img", { name: p.title });
+    const { container } = render(<ProjectFrame project={p} />);
+    expect(screen.queryByRole("img")).toBeNull();
+    const frame = container.querySelector(".type-plate")!;
+    expect(frame).toHaveAttribute("aria-hidden", "true");
     expect(frame).toHaveTextContent(p.category);
     expect(frame).toHaveTextContent("t1");
     expect(frame).not.toHaveTextContent("t6");

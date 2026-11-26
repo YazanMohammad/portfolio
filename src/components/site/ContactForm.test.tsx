@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { apiSend } from "@/lib/api";
@@ -15,17 +16,26 @@ function deferred() { let resolve!: (value: { ok: true }) => void; const promise
 beforeEach(() => { send.mockReset(); });
 afterEach(() => { vi.restoreAllMocks(); });
 describe("ContactForm", () => {
+  it("renders an empty polite status region that is never display:none", () => {
+    render(<ContactForm />);
+    const status = screen.getByRole("status");
+    expect(status).toBeEmptyDOMElement();
+    expect(status).not.toHaveAttribute("hidden");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    const css = readFileSync("src/components/site/site.css", "utf8");
+    expect(css).not.toMatch(/form__status:empty\s*\{[^}]*display:\s*none/);
+  });
   it("posts the exact MessageInput and waits for ok before clearing fields and announcing sent", async () => {
     const pending = deferred(); send.mockReturnValue(pending.promise);
     render(<ContactForm />); fill(); fireEvent.submit(form());
     expect(send).toHaveBeenCalledExactlyOnceWith("POST", "/api/messages", { ...values, website: "" });
-    expect(screen.getByRole("button")).toBeDisabled();
+    expect(screen.getByRole("button")).toHaveAttribute("aria-disabled", "true");
     expect(screen.queryByText(siteCopy.contact.sent)).toBeNull();
     expect(screen.getByLabelText("Name")).toHaveValue(values.name);
     await act(async () => pending.resolve({ ok: true }));
     expect(screen.getByRole("status")).toHaveTextContent(siteCopy.contact.sent);
     for (const label of Object.values(siteCopy.contact.labels)) expect(screen.getByLabelText(label)).toHaveValue("");
-    expect(screen.getByRole("button")).toBeEnabled();
+    expect(screen.getByRole("button")).not.toHaveAttribute("aria-disabled");
   });
   it("validates locally with editable copy instead of browser-generated messages", async () => {
     render(<ContactForm />); fireEvent.submit(form());

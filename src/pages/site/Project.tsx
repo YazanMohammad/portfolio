@@ -41,7 +41,7 @@ export default function Project() {
                 {code && <a className="link" href={code} target="_blank" rel="noopener noreferrer">{siteCopy.work.viewCode}</a>}
               </dd></div>}
             </dl>}
-            {project.imageKey && <div className="project-picture"><img src={fileUrl(project.imageKey)} alt={project.imageAlt ?? ""} decoding="async" /></div>}
+            {project.imageKey && <div className="project-picture"><img src={fileUrl(project.imageKey)} alt={project.imageAlt ?? project.title} decoding="async" /></div>}
             {project.body.trim() && <div className="measure project-body"><Markdown article source={project.body} /></div>}
           </>}
         </div>
