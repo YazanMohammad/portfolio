@@ -23,7 +23,7 @@ import App from "./App";
 
 const table: [string, string][] = [
   ["/", "home"],
-  ["/projects/portfolio-v1", "project"],
+  ["/projects/spitfire", "project"],
   ["/admin", "login"],
   ["/admin/dashboard", "dashboard"],
   ["/admin/profile", "profile"],

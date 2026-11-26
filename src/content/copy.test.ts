@@ -32,10 +32,10 @@ describe("profile copy", () => {
     }
   });
 
-  it("names no employer for the AI Engineer role", () => {
+  it("names only the CV employer for the AI Engineer role", () => {
     const text = `${PROFILE_INTRO}\n${PROFILE_ABOUT}`;
     expect(text).toMatch(/AI engineer/i);
-    expect(text).not.toMatch(/AI engineer (at|for|with) /i);
+    expect(text).toContain("MenaDevs");
     expect(text).not.toMatch(/\b(RFP|tender|OCR)\b/i);
   });
 

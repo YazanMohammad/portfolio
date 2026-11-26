@@ -76,7 +76,7 @@ export async function runSeed(opts: {
   const cvKey = noBlobs ? null : await storeCv(opts.fetchCv ?? fetch, upload);
   const projectRows = [];
   for (const project of seedProjects) {
-    const imageKey = noBlobs ? null : await storeImage(project.slug, upload);
+    const imageKey = noBlobs || !PREVIEW_FILES[project.slug] ? null : await storeImage(project.slug, upload);
     projectRows.push(projectToRow(ProjectInput.parse({
       ...project, imageKey, imageAlt: imageKey ? `Screenshot of ${project.title}` : null,
     })));

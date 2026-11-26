@@ -2,13 +2,9 @@
 // PROFILE_INTRO and PROFILE_ABOUT by relative path.
 
 export const PROFILE_INTRO =
-  "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs.";
+  "I'm an AI Engineer in Jordan. I evaluate AI responses and review AI-generated code. I also build web and mobile apps.";
 
-export const PROFILE_ABOUT = [
-  "I write TypeScript, Python and C#. My web projects use React, ASP.NET Core and MS SQL Server.",
-  "At Xocialive, I worked as a software engineering intern. I built and maintained web apps, worked on the backend and database queries, and helped the team with UI changes.",
-  "I studied computer science at Zarqa University. I'm open to full-time roles and freelance work.",
-].join("\n\n");
+export const PROFILE_ABOUT = "I write Python, C#, JavaScript and TypeScript. At MenaDevs, I evaluate AI responses and review AI-generated GitHub changes against tests and repository requirements.\n\nAt CAVT, I taught digital skills and basic networking. During my internship at Xocialive, I built React.js features backed by ASP.NET Core and SQL Server and fixed issues across the frontend, API and database.\n\nI studied computer science at Zarqa University. My projects include an Android music player, an Arabic zakat calculator and a real-time chat application.";
 
 export const siteCopy = {
   loading: "Loading…",

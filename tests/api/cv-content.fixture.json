@@ -1,0 +1,124 @@
+{
+  "skills": [
+    {
+      "label": "Languages",
+      "items": [
+        "Python",
+        "C#",
+        "JavaScript",
+        "TypeScript",
+        "SQL",
+        "Java"
+      ]
+    },
+    {
+      "label": "AI Evaluation",
+      "items": [
+        "LLM-response evaluation",
+        "coding and reasoning assessment",
+        "instruction-following evaluation",
+        "Arabic-language quality review",
+        "prompt design"
+      ]
+    },
+    {
+      "label": "AI Development Tools",
+      "items": [
+        "Codex",
+        "Claude coding agents",
+        "MCP tool use for coding",
+        "n8n"
+      ]
+    },
+    {
+      "label": "Backend & APIs",
+      "items": [
+        "REST/JSON APIs",
+        "API integration",
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "SQL Server",
+        "JWT authentication",
+        "input validation",
+        "Swagger",
+        "SignalR"
+      ]
+    },
+    {
+      "label": "Frontend & Engineering Tools",
+      "items": [
+        "React.js",
+        "HTML",
+        "CSS",
+        "Git",
+        "Docker",
+        "Linux"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "title": "AI Engineer",
+      "org": "MenaDevs",
+      "dates": "Aug 2026 - Present",
+      "bullets": [
+        "Evaluate AI responses across coding, reasoning, Arabic-language, and instruction-following tasks; assess accuracy and quality and provide structured feedback.",
+        "Review AI-generated GitHub changes against tests and repository requirements, identifying bugs and implementation gaps to support code-quality assessment."
+      ]
+    },
+    {
+      "title": "ICDL and Networking Trainer",
+      "org": "CAVT",
+      "dates": "Dec 2025 - Apr 2026",
+      "bullets": [
+        "Delivered digital-skills and basic networking training, including ICDL, Ethernet crimping, and patch-panel connections."
+      ]
+    },
+    {
+      "title": "Software Engineering Intern",
+      "org": "Xocialive",
+      "dates": "Sep 2024 - Jan 2025",
+      "bullets": [
+        "Built React.js features backed by ASP.NET Core and SQL Server; fixed issues across the frontend, API, and database."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Spitfire Music Player",
+      "link": {
+        "text": "GitHub",
+        "url": "https://github.com/YazanMohammad/Spitfire"
+      },
+      "dates": "Oct 2026",
+      "tech": "Flutter, Dart, Riverpod, go_router, just_audio, audio_service",
+      "bullets": [
+        "Built an ad-free Android music player with background playback, a play queue, on-device music discovery, Jamendo REST API search, and synced lyrics; covered with unit and widget tests (flutter_test, mocktail)."
+      ]
+    },
+    {
+      "name": "Zakat Calculator",
+      "link": {
+        "text": "zaka.yznmoh.com",
+        "url": "https://zaka.yznmoh.com"
+      },
+      "dates": "Mar 2026",
+      "tech": "Next.js, React, TypeScript, Tailwind CSS, Netlify",
+      "bullets": [
+        "Built an Arabic (RTL) web app that calculates four types of zakat, checks the nisab against live gold and silver prices from a Next.js API route, and exports PDF reports."
+      ]
+    },
+    {
+      "name": "Real-Time Chat Application",
+      "link": {
+        "text": "chat.yznmoh.com",
+        "url": "https://chat.yznmoh.com"
+      },
+      "dates": "Feb 2026",
+      "tech": "ASP.NET Core, SignalR, React.js, JavaScript, CSS",
+      "bullets": [
+        "Built a responsive application with authentication, private messaging, input validation, unread indicators, and real-time updates through SignalR; used Codex and Claude coding agents during development."
+      ]
+    }
+  ]
+}

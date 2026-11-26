@@ -11,19 +11,17 @@ describe("fallback snapshot", () => {
     expect(fallback.profile.cvUrl).toBeNull();
   });
 
-  it("gives no current role a company or start date", () => {
+  it("keeps the current CV role and its approved details", () => {
     const current = fallback.experience.filter((e) => e.current);
-    expect(current.length).toBeGreaterThan(0);
-    for (const e of current) {
-      expect(e.company).toBeNull();
-      expect(e.startDate).toBeNull();
-    }
+    expect(current).toHaveLength(1);
+    expect(current[0]).toMatchObject({company:"MenaDevs",startDate:"2026-08",endDate:null});
+    expect(current[0].bullets).toHaveLength(2);
   });
 
-  it("uses the shared copy, three projects and fourteen skills", () => {
+  it("uses the shared copy, three projects and thirty skills", () => {
     expect(fallback.profile.intro).toBe(PROFILE_INTRO);
     expect(fallback.profile.about).toBe(PROFILE_ABOUT);
-    expect(fallback.projects.map((p) => p.slug)).toEqual(["portfolio-v1", "chat-app", "tic-tac-toe"]);
-    expect(fallback.skills).toHaveLength(14);
+    expect(fallback.projects.map((p) => p.slug)).toEqual(["spitfire", "zakat-calculator", "chat-app"]);
+    expect(fallback.skills).toHaveLength(30);
   });
 });

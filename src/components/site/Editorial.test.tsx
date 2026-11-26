@@ -31,10 +31,14 @@ describe("editorial public site", () => {
     content.skills.forEach(s=>expect(screen.getByText(s.name, { selector: "li" })).toBeInTheDocument());
     expect(container.querySelector("img, svg")).toBeNull();
   });
-  it("never associates AI Engineer with dates or an employer, or prints education metrics", () => {
-    const ai={...content.experience[0],company:"Private employer",startDate:"2026-01",endDate:null};
-    render(<TimelineSection experience={[ai,content.experience[1]]} education={content.education} />);
-    expect(screen.queryByText("Private employer")).toBeNull();expect(screen.queryByText(/2026/)).toBeNull();expect(screen.queryByText(/GPA/)).toBeNull();expect(screen.getByText(/Xocialive/)).toBeInTheDocument();
+  it("shows CV employers, dates and bullets, without education metrics", () => {
+    render(<TimelineSection experience={content.experience} education={content.education} />);
+    expect(screen.getByText("MenaDevs")).toBeInTheDocument();
+    expect(screen.getByText(/Aug 2026/)).toBeInTheDocument();
+    expect(screen.getByText("CAVT")).toBeInTheDocument();
+    expect(screen.getByText(/Xocialive/)).toBeInTheDocument();
+    content.experience.flatMap(e => e.bullets).forEach(b => expect(screen.getByText(b)).toBeInTheDocument());
+    expect(screen.queryByText(/GPA/)).toBeNull();
   });
   it("keeps the editorial link, numeral, margin and grid contracts", () => {
     const css = readFileSync("src/components/site/site.css", "utf8");
@@ -44,7 +48,7 @@ describe("editorial public site", () => {
     expect(css).toContain(".skills__group li { white-space: nowrap; }");
     expect(css).toContain(".project-margin { grid-column: 1 / 4;");
     expect(css).toContain(".hero__intro { grid-column: 4 / 11;");
-    const { container } = render(<WorkSection projects={content.projects.map((p, index) => ({ ...p, id: 99 + index * 3 }))} />);
+    const { container } = render(<WorkSection projects={content.projects.map((p, index) => ({ ...p, id: 99 + index * 3, title: index === 0 ? "Example 1" : p.title }))} />);
     container.querySelectorAll(".project-entry").forEach((row, index) => {
       expect(row).toHaveAttribute("id", `project-${content.projects[index].slug}`);
       expect(row.querySelector(".type-plate")).toHaveClass(`type-plate--${index % 3}`);

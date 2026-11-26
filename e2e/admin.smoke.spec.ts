@@ -59,7 +59,7 @@ test("admin edits, public reflects, contact message round trip", async ({ page, 
 
   // 2. edit project summary
   await page.goto("/admin/projects");
-  await page.getByText("Portfolio V1").first().click();
+  await page.getByText("Spitfire Music Player").first().click();
   const field = page.getByLabel("Summary");
   const original = await field.inputValue();
   await field.fill(summary);
@@ -67,12 +67,12 @@ test("admin edits, public reflects, contact message round trip", async ({ page, 
   await expect(page.getByText("Saved", { exact: true }).first()).toBeVisible();
 
   // 3. public site shows it
-  await expectSummaryEventually(page, "/projects/portfolio-v1", summary);
+  await expectSummaryEventually(page, "/projects/spitfire", summary);
   await expectSummaryEventually(page, "/", summary);
 
   // 4. restore
   await page.goto("/admin/projects");
-  await page.getByText("Portfolio V1").first().click();
+  await page.getByText("Spitfire Music Player").first().click();
   await page.getByLabel("Summary").fill(original);
   await page.keyboard.press("Control+S");
   await expect(page.getByText("Saved", { exact: true }).first()).toBeVisible();

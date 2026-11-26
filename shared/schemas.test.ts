@@ -77,7 +77,7 @@ const imageKey = `${"a".repeat(32)}.jpg`;
 const pdfKey = `${"b".repeat(32)}.pdf`;
 const profile = {
   name: "Yazan Mohammad", headline: "AI Engineer", intro: "I build useful software.",
-  about: "", location: "Jordan", email: "ybmoh03@gmail.com",
+  about: "", location: "Jordan", email: "yazan.b.n@gmail.com",
   githubUrl: "https://github.com/YazanMohammad", linkedinUrl: null, available: true,
   availabilityText: null, photoKey: null, photoAlt: null, cvKey: null,
 };
@@ -140,8 +140,8 @@ const experience = {
   current: true, bullets: [], isVisible: true, sortOrder: 0,
 };
 const education = {
-  degree: "B.S. Computer Science", school: "Zarqa University", location: "Zarqa, Jordan",
-  startDate: "2021-01", endDate: "2024-01", description: "GPA 76.1%", isVisible: true, sortOrder: 0,
+  degree: "B.S. in Computer Science", school: "Zarqa University", location: "Zarqa, Jordan",
+  startDate: "2021-09", endDate: "2024-06", description: null, isVisible: true, sortOrder: 0,
 };
 const skill = { name: "Python", category: "Languages", iconSlug: "python", isVisible: true, sortOrder: 0 };
 

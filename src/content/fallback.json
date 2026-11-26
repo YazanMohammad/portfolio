@@ -2,37 +2,37 @@
   "profile": {
     "name": "Yazan Mohammad",
     "headline": "AI Engineer",
-    "intro": "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs.",
-    "about": "I write TypeScript, Python and C#. My web projects use React, ASP.NET Core and MS SQL Server.\u000a\u000aAt Xocialive, I worked as a software engineering intern. I built and maintained web apps, worked on the backend and database queries, and helped the team with UI changes.\u000a\u000aI studied computer science at Zarqa University. I'm open to full-time roles and freelance work.",
+    "intro": "I'm an AI Engineer in Jordan. I evaluate AI responses and review AI-generated code. I also build web and mobile apps.",
+    "about": "I write Python, C#, JavaScript and TypeScript. At MenaDevs, I evaluate AI responses and review AI-generated GitHub changes against tests and repository requirements.\n\nAt CAVT, I taught digital skills and basic networking. During my internship at Xocialive, I built React.js features backed by ASP.NET Core and SQL Server and fixed issues across the frontend, API and database.\n\nI studied computer science at Zarqa University. My projects include an Android music player, an Arabic zakat calculator and a real-time chat application.",
     "location": "Jordan",
-    "email": "ybmoh03@gmail.com",
+    "email": "yazan.b.n@gmail.com",
     "githubUrl": "https://github.com/YazanMohammad",
-    "linkedinUrl": null,
+    "linkedinUrl": "https://www.linkedin.com/in/yznmoh/",
     "available": true,
     "availabilityText": null,
     "photoAlt": null,
     "photoUrl": null,
     "cvUrl": null,
-    "updatedAt": "2026-11-25T00:00:00.000Z"
+    "updatedAt": "2026-11-26T00:00:00.000Z"
   },
   "projects": [
     {
       "id": 1,
-      "slug": "portfolio-v1",
-      "title": "Portfolio V1",
-      "summary": "Personal portfolio built with Next.js 16, TypeScript and Tailwind CSS, with a custom admin dashboard backed by PostgreSQL via Supabase.",
+      "slug": "spitfire",
+      "title": "Spitfire Music Player",
+      "summary": "Built an ad-free Android music player with background playback, a queue, on-device discovery, Jamendo API search and synced lyrics; covered with unit and widget tests.",
       "role": null,
-      "category": "Full Stack",
+      "category": "Mobile",
       "technologies": [
-        "Next.js 16",
-        "TypeScript",
-        "Tailwind CSS",
-        "Prisma",
-        "PostgreSQL",
-        "Supabase"
+        "Flutter",
+        "Dart",
+        "Riverpod",
+        "go_router",
+        "just_audio",
+        "audio_service"
       ],
-      "liveUrl": "https://www.yznmoh.com/",
-      "githubUrl": "https://github.com/YazanMohammad/portfolio",
+      "liveUrl": null,
+      "githubUrl": "https://github.com/YazanMohammad/Spitfire",
       "imageKey": null,
       "imageAlt": null,
       "featured": true,
@@ -40,19 +40,20 @@
     },
     {
       "id": 2,
-      "slug": "chat-app",
-      "title": "Chat App",
-      "summary": "A real-time chat app. React frontend, ASP.NET Core backend, SignalR for live messages.",
+      "slug": "zakat-calculator",
+      "title": "Zakat Calculator",
+      "summary": "Built an Arabic (RTL) app that calculates four types of zakat, checks nisab against live gold and silver prices from a Next.js API route, and exports PDF reports.",
       "role": null,
-      "category": "Full Stack",
+      "category": "Web",
       "technologies": [
-        "React.JS",
-        "ASP.NET Core",
-        "SignalR",
-        "C#"
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Netlify"
       ],
-      "liveUrl": "https://chat-app-by-me.vercel.app/",
-      "githubUrl": "https://github.com/YazanMohammad/ChatApp",
+      "liveUrl": "https://zaka.yznmoh.com",
+      "githubUrl": "https://github.com/YazanMohammad/zaka",
       "imageKey": null,
       "imageAlt": null,
       "featured": true,
@@ -60,16 +61,20 @@
     },
     {
       "id": 3,
-      "slug": "tic-tac-toe",
-      "title": "Tic-Tac-Toe",
-      "summary": "A Tic-Tac-Toe game in React. It detects wins and draws and works on phones.",
+      "slug": "chat-app",
+      "title": "Real-Time Chat Application",
+      "summary": "Built a responsive chat app with authentication, private messaging, input validation, unread indicators and SignalR updates; used Codex and Claude coding agents during development.",
       "role": null,
-      "category": "Web Development",
+      "category": "Full Stack",
       "technologies": [
-        "React.JS"
+        "ASP.NET Core",
+        "SignalR",
+        "React.js",
+        "JavaScript",
+        "CSS"
       ],
-      "liveUrl": null,
-      "githubUrl": null,
+      "liveUrl": "https://chat.yznmoh.com",
+      "githubUrl": "https://github.com/YazanMohammad/ChatApp",
       "imageKey": null,
       "imageAlt": null,
       "featured": false,
@@ -80,16 +85,32 @@
     {
       "id": 1,
       "position": "AI Engineer",
-      "company": null,
+      "company": "MenaDevs",
       "location": null,
-      "startDate": null,
+      "startDate": "2026-08",
       "endDate": null,
       "current": true,
-      "bullets": [],
+      "bullets": [
+        "Evaluate AI responses across coding, reasoning, Arabic-language, and instruction-following tasks; assess accuracy and quality and provide structured feedback.",
+        "Review AI-generated GitHub changes against tests and repository requirements, identifying bugs and implementation gaps to support code-quality assessment."
+      ],
       "sortOrder": 1
     },
     {
       "id": 2,
+      "position": "ICDL and Networking Trainer",
+      "company": "CAVT",
+      "location": null,
+      "startDate": "2025-12",
+      "endDate": "2026-04",
+      "current": false,
+      "bullets": [
+        "Delivered digital-skills and basic networking training, including ICDL, Ethernet crimping, and patch-panel connections."
+      ],
+      "sortOrder": 2
+    },
+    {
+      "id": 3,
       "position": "Software Engineering Intern",
       "company": "Xocialive",
       "location": "Jordan",
@@ -97,123 +118,233 @@
       "endDate": "2025-01",
       "current": false,
       "bullets": [
-        "Developed and maintained web applications using React.JS, ASP.NET Core, and MS SQL Server.",
-        "Worked on the backend and made slow database queries faster.",
-        "Worked with the team on UI changes."
+        "Built React.js features backed by ASP.NET Core and SQL Server; fixed issues across the frontend, API, and database."
       ],
-      "sortOrder": 2
+      "sortOrder": 3
     }
   ],
   "education": [
     {
       "id": 1,
-      "degree": "B.S. Computer Science",
+      "degree": "B.S. in Computer Science",
       "school": "Zarqa University",
       "location": "Zarqa, Jordan",
-      "startDate": "2021-01",
-      "endDate": "2024-01",
-      "description": "GPA 76.1%",
+      "startDate": "2021-09",
+      "endDate": "2024-06",
+      "description": null,
       "sortOrder": 1
     }
   ],
   "skills": [
     {
       "id": 1,
-      "name": "TypeScript",
+      "name": "Python",
       "category": "Languages",
-      "iconSlug": "typescript",
+      "iconSlug": "python",
       "sortOrder": 1
     },
     {
       "id": 2,
-      "name": "JavaScript",
+      "name": "C#",
       "category": "Languages",
-      "iconSlug": "javascript",
+      "iconSlug": "csharp",
       "sortOrder": 2
     },
     {
       "id": 3,
-      "name": "Python",
+      "name": "JavaScript",
       "category": "Languages",
-      "iconSlug": "python",
+      "iconSlug": "javascript",
       "sortOrder": 3
     },
     {
       "id": 4,
-      "name": "Java",
+      "name": "TypeScript",
       "category": "Languages",
-      "iconSlug": "java",
+      "iconSlug": "typescript",
       "sortOrder": 4
     },
     {
       "id": 5,
-      "name": "C#",
+      "name": "SQL",
       "category": "Languages",
-      "iconSlug": "csharp",
+      "iconSlug": null,
       "sortOrder": 5
     },
     {
       "id": 6,
-      "name": "C++",
+      "name": "Java",
       "category": "Languages",
-      "iconSlug": "cplusplus",
+      "iconSlug": "java",
       "sortOrder": 6
     },
     {
       "id": 7,
-      "name": "C",
-      "category": "Languages",
+      "name": "LLM-response evaluation",
+      "category": "AI Evaluation",
       "iconSlug": null,
       "sortOrder": 7
     },
     {
       "id": 8,
-      "name": "PHP",
-      "category": "Languages",
-      "iconSlug": "php",
+      "name": "coding and reasoning assessment",
+      "category": "AI Evaluation",
+      "iconSlug": null,
       "sortOrder": 8
     },
     {
       "id": 9,
-      "name": "SQL",
-      "category": "Languages",
+      "name": "instruction-following evaluation",
+      "category": "AI Evaluation",
       "iconSlug": null,
       "sortOrder": 9
     },
     {
       "id": 10,
-      "name": "React",
-      "category": "Frameworks",
-      "iconSlug": "react",
+      "name": "Arabic-language quality review",
+      "category": "AI Evaluation",
+      "iconSlug": null,
       "sortOrder": 10
     },
     {
       "id": 11,
-      "name": "ASP.NET Core",
-      "category": "Frameworks",
-      "iconSlug": "dotnet",
+      "name": "prompt design",
+      "category": "AI Evaluation",
+      "iconSlug": null,
       "sortOrder": 11
     },
     {
       "id": 12,
-      "name": "Git",
-      "category": "Tools",
-      "iconSlug": "git",
+      "name": "Codex",
+      "category": "AI Development Tools",
+      "iconSlug": null,
       "sortOrder": 12
     },
     {
       "id": 13,
-      "name": "EF Core",
-      "category": "Tools",
+      "name": "Claude coding agents",
+      "category": "AI Development Tools",
       "iconSlug": null,
       "sortOrder": 13
     },
     {
       "id": 14,
-      "name": "LLMs",
-      "category": "Technologies",
+      "name": "MCP tool use for coding",
+      "category": "AI Development Tools",
       "iconSlug": null,
       "sortOrder": 14
+    },
+    {
+      "id": 15,
+      "name": "n8n",
+      "category": "AI Development Tools",
+      "iconSlug": null,
+      "sortOrder": 15
+    },
+    {
+      "id": 16,
+      "name": "REST/JSON APIs",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 16
+    },
+    {
+      "id": 17,
+      "name": "API integration",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 17
+    },
+    {
+      "id": 18,
+      "name": "ASP.NET Core",
+      "category": "Backend & APIs",
+      "iconSlug": "dotnet",
+      "sortOrder": 18
+    },
+    {
+      "id": 19,
+      "name": "Entity Framework Core",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 19
+    },
+    {
+      "id": 20,
+      "name": "SQL Server",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 20
+    },
+    {
+      "id": 21,
+      "name": "JWT authentication",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 21
+    },
+    {
+      "id": 22,
+      "name": "input validation",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 22
+    },
+    {
+      "id": 23,
+      "name": "Swagger",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 23
+    },
+    {
+      "id": 24,
+      "name": "SignalR",
+      "category": "Backend & APIs",
+      "iconSlug": null,
+      "sortOrder": 24
+    },
+    {
+      "id": 25,
+      "name": "React.js",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": "react",
+      "sortOrder": 25
+    },
+    {
+      "id": 26,
+      "name": "HTML",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": null,
+      "sortOrder": 26
+    },
+    {
+      "id": 27,
+      "name": "CSS",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": null,
+      "sortOrder": 27
+    },
+    {
+      "id": 28,
+      "name": "Git",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": "git",
+      "sortOrder": 28
+    },
+    {
+      "id": 29,
+      "name": "Docker",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": null,
+      "sortOrder": 29
+    },
+    {
+      "id": 30,
+      "name": "Linux",
+      "category": "Frontend & Engineering Tools",
+      "iconSlug": null,
+      "sortOrder": 30
     }
   ],
   "settings": {
@@ -229,7 +360,7 @@
       },
       "meta": {
         "title": "Yazan Mohammad: AI Engineer",
-        "description": "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs."
+        "description": "I'm an AI Engineer in Jordan. I evaluate AI responses and review AI-generated code. I also build web and mobile apps."
       },
       "dates": {
         "since": "Since",

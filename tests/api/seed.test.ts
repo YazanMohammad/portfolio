@@ -40,22 +40,22 @@ describeDb("seed script (real db)", () => {
   it("seeds the content in contract §8", async () => {
     expect(await runSeed({ force: false, ...seedOptions })).toEqual({ skipped: false });
     expect([await rows(profile), await rows(experience), await rows(education), await rows(projects), await rows(skills)])
-      .toEqual([1, 2, 1, 3, 14]);
+      .toEqual([1, 3, 1, 3, 30]);
     const exp = await db.select().from(experience);
     const ai = exp.find((r) => r.position === "AI Engineer")!;
-    expect(ai).toMatchObject({ company: null, startDate: null, endDate: null, current: true });
+    expect(ai).toMatchObject({ company: "MenaDevs", startDate: "2026-08-01", endDate: null, current: true });
     const intern = exp.find((r) => r.position === "Software Engineering Intern")!;
     expect(intern).toMatchObject({ startDate: "2024-09-01", endDate: "2025-01-01", current: false });
-    expect(intern.bullets).toHaveLength(3);
+    expect(intern.bullets).toEqual(seedExperience[2].bullets);
     const [edu] = await db.select().from(education);
-    expect(edu).toMatchObject({ startDate: "2021-01-01", endDate: "2024-01-01", description: "GPA 76.1%" });
+    expect(edu).toMatchObject({ startDate: "2021-09-01", endDate: "2024-06-01", description: null });
     const slugs = (await db.select().from(projects)).map((r) => r.slug).sort();
-    expect(slugs).toEqual(["chat-app", "portfolio-v1", "tic-tac-toe"]);
+    expect(slugs).toEqual(["chat-app", "spitfire", "zakat-calculator"]);
     const [p] = await db.select().from(profile);
     expect(p).toMatchObject({ photoKey: null, name: "Yazan Mohammad", headline: "AI Engineer" });
     expect(p.cvKey).toMatch(/\.pdf$/);
     const skillRows = await db.select().from(skills);
-    expect(skillRows.find((s) => s.name === "C")!.iconSlug).toBeNull();
+    expect(skillRows.find((s) => s.name === "LLM-response evaluation")!.iconSlug).toBeNull();
     expect(skillRows.find((s) => s.name === "SQL")!.iconSlug).toBeNull();
   });
 
@@ -82,7 +82,7 @@ describeDb("seed script (real db)", () => {
     await createSession();
     await runSeed({ force: true, ...seedOptions });
     expect((await db.select().from(profile))[0].name).toBe("Yazan Mohammad");
-    expect([await rows(experience), await rows(education), await rows(projects), await rows(skills)]).toEqual([2, 1, 3, 14]);
+    expect([await rows(experience), await rows(education), await rows(projects), await rows(skills)]).toEqual([3, 1, 3, 30]);
     expect(await rows(messages)).toBe(1);
     expect(await rows(loginAttempts)).toBe(1);
     expect(await rows(adminSessions)).toBe(1);
@@ -130,14 +130,18 @@ describeDb("seed script (real db)", () => {
   it("project images are stored and keyed", async () => {
     await runSeed({ force: false, ...seedOptions });
     const imageCalls = uploadFile.mock.calls.filter(([, ext]) => ext === "png");
-    expect(imageCalls).toHaveLength(3);
+    expect(imageCalls).toHaveLength(1);
     for (const [bytes, , type] of imageCalls) {
       expect(bytes.byteLength).toBeGreaterThan(0);
       expect(type).toBe("image/png");
     }
     for (const row of await db.select().from(projects)) {
-      expect(row.imageKey).toMatch(/^[a-f0-9]{32}\.png$/);
-      expect(row.imageAlt).toBe(`Screenshot of ${row.title}`);
+      if (row.slug === "chat-app") {
+        expect(row.imageKey).toMatch(/^[a-f0-9]{32}\.png$/);
+        expect(row.imageAlt).toBe(`Screenshot of ${row.title}`);
+      } else {
+        expect(row.imageKey).toBeNull(); expect(row.imageAlt).toBeNull();
+      }
     }
   });
 
@@ -178,8 +182,8 @@ describeDb("seed script (real db)", () => {
     const data: PublicContent = await response.json();
     expect(data.profile.name).toBe("Yazan Mohammad");
     expect(data.profile.cvUrl).toBe("/cv");
-    expect(data.projects.map((r) => r.slug).sort()).toEqual(["chat-app", "portfolio-v1", "tic-tac-toe"]);
-    expect(data.experience).toHaveLength(2);
-    expect(data.skills).toHaveLength(14);
+    expect(data.projects.map((r) => r.slug).sort()).toEqual(["chat-app", "spitfire", "zakat-calculator"]);
+    expect(data.experience).toHaveLength(3);
+    expect(data.skills).toHaveLength(30);
   });
 });
