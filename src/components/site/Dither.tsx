@@ -8,7 +8,9 @@ export function Dither({ shape = 0, animate = false, className = "" }: { shape?:
   const theme = useSiteTheme();
   const hidden = className.includes("section-art") && !theme.sectionShapes;
   const ref = useRef<HTMLCanvasElement>(null);
-  const reduced = useMedia("(prefers-reduced-motion: reduce)") || useMotionPaused();
+  const media = useMedia("(prefers-reduced-motion: reduce)");
+  const paused = useMotionPaused();
+  const reduced = media || paused;
   useEffect(() => {
     if (hidden) return;
     const canvas = ref.current;
