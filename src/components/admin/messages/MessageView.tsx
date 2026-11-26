@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { formatMessageDate } from "@/lib/admin/format-date";
 import type { Message, MessagePatch } from "@shared/index";
 import { useDeleteMessage, usePatchMessage } from "@/lib/admin/queries";
@@ -8,7 +8,8 @@ import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescripti
 import "../lists.css";
 import { replyHref } from "./mailto";
 
-export function MessageView({ initial, onSaved, onClose }: {
+export function MessageView({ initial, onSaved, onClose, focusFallback }: {
+  focusFallback?: RefObject<HTMLElement | null>;
   initial: Message; onSaved: (message: Message) => void; onClose: () => void;
 }) {
   const [message, setMessage] = useState(initial);
@@ -70,7 +71,11 @@ export function MessageView({ initial, onSaved, onClose }: {
     </AlertDialog>
   </article>;
   return mobile ? <Sheet open onOpenChange={open => { if (!open) onClose(); }}>
-    <SheetContent onCloseAutoFocus={event => { if (opener.current?.isConnected) { event.preventDefault(); opener.current.focus(); } }} className="admin-message-sheet w-full overflow-y-auto p-4 sm:max-w-lg">
+    <SheetContent onCloseAutoFocus={event => {
+      event.preventDefault();
+      const target = opener.current?.isConnected && opener.current !== document.body ? opener.current : focusFallback?.current;
+      target?.focus();
+    }} className="admin-message-sheet w-full overflow-y-auto p-4 sm:max-w-lg">
       <SheetTitle className="pr-12 text-lg">{message.subject || "(no subject)"}</SheetTitle><SheetDescription>Read and manage this message.</SheetDescription>
       {content}
     </SheetContent>

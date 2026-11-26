@@ -28,6 +28,30 @@ const renderInbox = (path = "/admin/messages") => renderWithProviders(<Messages 
 const open = async (id = 1) => userEvent.setup().click(await screen.findByRole("button", { name: new RegExp(`Sender ${id}`) }));
 
 describe("messages inbox", () => {
+  it.each(["unread", "archive", "delete", "deep-link", "connected-row"])("returns mobile sheet focus after %s", async flow => {
+    const media = vi.spyOn(window, "matchMedia").mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() } as unknown as MediaQueryList);
+    try {
+      renderInbox(flow === "deep-link" ? "/admin/messages?open=2" : "/admin/messages");
+      let opener: HTMLElement | undefined;
+      if (flow !== "deep-link") {
+        if (flow !== "unread") await userEvent.setup().click(screen.getByRole("tab", { name: "All" }));
+        opener = await screen.findByRole("button", { name: /Sender 1/ });
+        await userEvent.setup().click(opener);
+      }
+      const dialog = await screen.findByRole("dialog");
+      if (flow === "unread") await waitFor(() => expect(opener!.isConnected).toBe(false));
+      if (flow === "archive") {
+        await userEvent.setup().click(within(dialog).getByRole("button", { name: "Archive" }));
+        await waitFor(() => expect(opener!.isConnected).toBe(false));
+      }
+      if (flow === "delete") {
+        await userEvent.setup().click(within(dialog).getByRole("button", { name: "Delete" }));
+        await userEvent.setup().click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Delete message" }));
+      } else await userEvent.setup().click(within(dialog).getByRole("button", { name: "Close" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      await waitFor(() => expect(flow === "connected-row" ? opener! : screen.getByRole("heading", { name: "Inbox" })).toHaveFocus());
+    } finally { media.mockRestore(); }
+  });
   it("lists unread first then newest, with stable ties", async () => {
     rows = [message(2, true, "2026-11-26T12:00:00Z"), message(1), message(3), message(4, false, "2026-11-26T12:00:00Z")];
     renderInbox();

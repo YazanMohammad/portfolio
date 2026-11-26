@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { createElement } from "react";
 
 const TITLES: [string, string][] = [
   ["/admin/dashboard", "Dashboard"],
@@ -18,13 +18,7 @@ export function adminTitleFor(path: string): string {
   return hit ? `${hit[1]} · Admin` : "Admin";
 }
 
-/** Sets document.title while mounted and restores the previous title on unmount. */
-export function useAdminTitle(title: string): void {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = title;
-    return () => {
-      document.title = previous;
-    };
-  }, [title]);
+/** Share React's declarative title ownership with the public pages. */
+export function AdminTitle({ title }: { title: string }) {
+  return createElement("title", null, title);
 }

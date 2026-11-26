@@ -9,7 +9,7 @@ import { disableKit } from "@/lib/admin/kit";
 import { useAdminSummary, useLogout } from "@/lib/admin/queries";
 import { UnsavedProvider, useGuardedAction } from "@/lib/admin/unsaved";
 import { AdminNav } from "./AdminNav";
-import { adminTitleFor, useAdminTitle } from "./useAdminTitle";
+import { adminTitleFor, AdminTitle } from "./useAdminTitle";
 import { adminAccentText } from "@/lib/admin/accent-text";
 
 import { mergeSettings, derivePalette, type AdminSettings } from "@shared/settings";
@@ -34,7 +34,6 @@ function Shell({ children }: { children: ReactNode }) {
   const mobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [location, navigate] = useLocation();
-  useAdminTitle(adminTitleFor(location));
   const queryClient = useQueryClient();
   const summary = useAdminSummary();
   const logout = useLogout();
@@ -66,6 +65,7 @@ function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="admin-shell flex min-h-screen bg-background font-sans text-sm text-foreground">
+      <AdminTitle title={adminTitleFor(location)} />
       <a
         href="#main"
         className="sr-only z-50 rounded-md bg-background px-3 py-2 focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:ring-2 focus:ring-ring"

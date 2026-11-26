@@ -133,6 +133,23 @@ function bodyReq(headers: Record<string, string>, body = "{}") {
   return new Request("https://example.com/api", { method: "POST", headers, body });
 }
 const anySchema = z.object({}).passthrough();
+it.each([undefined, "1"])("stops and cancels an oversized stream with declared length %s", async declared => {
+  let pulls = 0;
+  const cancel = vi.fn();
+  const body = new ReadableStream<Uint8Array>({
+    pull(controller) { pulls++; controller.enqueue(new Uint8Array(8)); if (pulls === 20) controller.close(); },
+    cancel,
+  }, { highWaterMark: 0 });
+  const request = new Request(req.url, { method: "PUT", body, duplex: "half", headers: declared ? { "content-length": declared } : {} } as RequestInit);
+  await expect(readJson(request, anySchema, 10)).rejects.toMatchObject({ status: 413 });
+  expect(pulls).toBe(2);
+  expect(cancel).toHaveBeenCalledOnce();
+});
+it("decodes multibyte JSON split across chunks", async () => {
+  const bytes = new TextEncoder().encode('{"name":"€"}');
+  const body = new ReadableStream<Uint8Array>({ start(c) { for (const byte of bytes) c.enqueue(Uint8Array.of(byte)); c.close(); } });
+  expect(await readJson(new Request(req.url, { method: "POST", body, duplex: "half" } as RequestInit), schema, bytes.length)).toEqual({ name: "€" });
+});
 
 it("readJson rejects over-cap Content-Length without reading the body", async () => {
   const r = bodyReq({ "content-length": "100" });

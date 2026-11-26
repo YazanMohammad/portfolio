@@ -1,8 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { renderHook } from "@testing-library/react";
-import { adminTitleFor, useAdminTitle } from "./useAdminTitle";
+import { render } from "@testing-library/react";
+import { adminTitleFor, AdminTitle } from "./useAdminTitle";
 
 describe("admin titles", () => {
+  it("lets the incoming public title win after public A → admin → public B", () => {
+    function Admin() { return <AdminTitle title="Projects · Admin" />; }
+    const view = render(<title>Public A</title>);
+    view.rerender(<Admin />);
+    expect(document.title).toBe("Projects · Admin");
+    view.rerender(<title>Specific project</title>);
+    expect(document.title).toBe("Specific project");
+  });
   it("maps every admin route to its own title", () => {
     expect(adminTitleFor("/admin/projects")).toBe("Projects · Admin");
     expect(adminTitleFor("/admin/site-text")).toBe("Site text · Admin");
@@ -14,10 +22,10 @@ describe("admin titles", () => {
     expect(new Set(all).size).toBe(9);
   });
   it("sets and restores document.title", () => {
-    document.title = "Public";
-    const { unmount } = renderHook(() => useAdminTitle("Login · Admin"));
+    const view = render(<title>Public</title>);
+    view.rerender(<AdminTitle title="Login · Admin" />);
     expect(document.title).toBe("Login · Admin");
-    unmount();
+    view.rerender(<title>Public</title>);
     expect(document.title).toBe("Public");
   });
 });

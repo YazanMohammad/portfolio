@@ -20,12 +20,22 @@ test("site text, tone and preview save through the new admin", async ({page})=>{
  try {
   await page.goto('/admin/site-text');await page.getByRole('searchbox',{name:'Find site text'}).fill('Work heading');
   await page.getByLabel('Work heading',{exact:true}).fill(heading);
-  await expect(page.getByRole('button',{name:'Work · 1 changed'})).toBeVisible();
+  await expect(page.getByRole('tab',{name:'Work · 1 changed'})).toBeVisible();
   await expect(page.getByLabel('Site text has unsaved changes')).toBeVisible();
   await page.keyboard.press('Control+S');await expect(page.getByText('Saved',{exact:true}).first()).toBeVisible();
   await page.goto('/admin/look');const tone=page.getByRole('slider',{name:'Tone'});await tone.fill('200');
   await expect(page.getByTestId('site-preview')).toHaveAttribute('data-hue','200');
-  await page.getByRole('checkbox',{name:/Hero sphere/}).uncheck();
+  await expect(async()=>{
+   const size=await page.getByTestId('site-preview').evaluate(preview=>{
+    const stage=preview.querySelector<HTMLElement>('.admin-preview-stage')!,view=preview.querySelector<HTMLElement>('.admin-preview-viewport')!,heading=preview.querySelector<HTMLElement>('.hero h1')!;
+    return {width:stage.offsetWidth,scale:Number(stage.dataset.scale),visual:stage.getBoundingClientRect().width,viewport:view.clientWidth,font:parseFloat(getComputedStyle(heading).fontSize),height:parseFloat(view.style.height),stageHeight:stage.offsetHeight,container:getComputedStyle(stage).containerType};
+   });
+   expect(size.width).toBe(1200);expect(size.container).toBe('inline-size');
+   expect(size.font).toBeCloseTo(1200*0.1235,1);
+   expect(size.visual).toBeCloseTo(size.width*size.scale,1);expect(Math.abs(size.visual-size.viewport)).toBeLessThan(2);
+   expect(size.height).toBeCloseTo(size.stageHeight*size.scale,1);
+  }).toPass();
+  await page.getByText('Hero sphere',{exact:true}).click();await expect(page.getByRole('switch',{name:/Hero sphere/})).not.toBeChecked();
   await expect(page.getByTestId('site-preview')).toHaveAttribute('data-sphere','false');
   await page.getByRole('button',{name:'Save',exact:true}).click();await expect(page.getByText('Saved',{exact:true}).first()).toBeVisible();
   const saved=await (await page.request.get('/api/admin/settings')).json();expect(saved.copy.work.heading).toBe(heading);expect(saved.theme).toMatchObject({hue:200,sphere:false});expect(saved.theme).not.toHaveProperty('grid');

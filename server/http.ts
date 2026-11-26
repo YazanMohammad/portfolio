@@ -52,8 +52,28 @@ export const SETTINGS_BODY_BYTES = 160 * 1024;
 export async function readJson<S extends ZodTypeAny>(req: Request, schema: S, maxBytes = DEFAULT_BODY_BYTES): Promise<z.infer<S>> {
   const declared = Number(req.headers.get("content-length"));
   if (Number.isFinite(declared) && declared > maxBytes) throw fail("too_large", "Request is too large.");
-  const text = await req.text();
-  if (new TextEncoder().encode(text).byteLength > maxBytes) throw fail("too_large", "Request is too large.");
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  const reader = req.body?.getReader();
+  if (reader) {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) {
+          // Never delay the 413 waiting for the sender to acknowledge cancellation.
+          void reader.cancel().catch(() => {});
+          throw fail("too_large", "Request is too large.");
+        }
+        chunks.push(value);
+      }
+    } finally { reader.releaseLock(); }
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  const text = new TextDecoder().decode(bytes);
   let data: unknown;
   try {
     data = JSON.parse(text);

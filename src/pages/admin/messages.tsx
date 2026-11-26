@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useSearch } from "wouter";
 import type { Message } from "@shared/index";
 import { MessageView } from "@/components/admin/messages/MessageView";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Messages() {
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const [status, setStatus] = useState<MessageStatus>("unread");
   const query = useAdminMessages(status);
   const all = useAdminMessages("all");
@@ -34,7 +35,7 @@ export default function Messages() {
     navigate(`${location}${params.size ? `?${params}` : ""}`);
   };
   return <section className="space-y-4 text-sm">
-    <PageHeader kicker="Messages" title="Inbox" intro="Messages from your site."/>
+    <PageHeader titleId="inbox-title" titleRef={titleRef} kicker="Messages" title="Inbox" intro="Messages from your site."/>
     <Tabs value={status} onValueChange={value => setStatus(value as MessageStatus)}>
       <TabsList aria-label="Message folders" className="admin-inbox-tabs h-auto">
         <TabsTrigger value="unread">Unread</TabsTrigger><TabsTrigger value="all">All</TabsTrigger><TabsTrigger value="archived">Archived</TabsTrigger>
@@ -45,7 +46,7 @@ export default function Messages() {
     {query.isPending ? <p role="status">Loading messages…</p> : query.isError ? <div role="alert">Could not load messages. <Button variant="outline" onClick={() => void query.refetch()}>Try again</Button></div> : query.data.length ?
       <MessageList messages={query.data} selectedId={id} onSelect={select} /> : <p className="p-4">{status === "unread" ? "No unread messages." : status === "archived" ? "No archived messages." : "No messages."}</p>}
     </div>
-    {selected ? <MessageView key={selected.id} initial={selected} onSaved={setSnapshot} onClose={close} /> : id !== null ?
+    {selected ? <MessageView key={selected.id} initial={selected} focusFallback={titleRef} onSaved={setSnapshot} onClose={close} /> : id !== null ?
       all.isPending || archived.isPending ? <p role="status">Loading selected message…</p> : all.isError || archived.isError ?
       <div role="alert"><p>Could not load selected message.</p><Button variant="outline" onClick={() => { void all.refetch(); void archived.refetch(); }}>Retry selected message</Button></div> : <p>Message not found.</p> : <p className="p-4 text-muted-foreground">Select a message to read it.</p>}
     </div>

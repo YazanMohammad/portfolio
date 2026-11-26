@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { disableKit } from "@/lib/admin/kit";
 import { useAuthMe, useLogin } from "@/lib/admin/queries";
 import { ApiRequestError } from "@/lib/api";
-import { useAdminTitle } from "@/components/admin/useAdminTitle";
+import { AdminTitle } from "@/components/admin/useAdminTitle";
 
 const DEFAULT_RETRY_SECONDS = 15 * 60;
 
@@ -18,7 +18,6 @@ function slowDownMessage(seconds?: number): string {
 }
 
 export default function AdminLogin() {
-  useAdminTitle("Log in · Admin");
   const [, navigate] = useLocation();
   const search = useSearch();
   const queryClient = useQueryClient();
@@ -66,6 +65,7 @@ export default function AdminLogin() {
 
   return (
     <main className="admin-shell admin-login min-h-screen grid place-items-center bg-background px-4 font-sans text-sm text-foreground">
+      <AdminTitle title="Log in · Admin" />
       <form
         onSubmit={onSubmit}
         className="w-full max-w-sm space-y-4 rounded-md border border-border p-6"

@@ -109,20 +109,31 @@ it("Look: tone slider has one name, a value text and a described hint",async()=>
  expect(tone).toHaveAccessibleDescription(/One colour/);expect(tone).not.toHaveAttribute("aria-label");
  expect(screen.queryByRole("group",{name:"Tone"})).toBeNull();
 });
-it("preview scale comes from the container width and reserves height",async()=>{
- const callbacks:((entries:unknown[])=>void)[]=[];
+it("preview observes independent width/height changes and disconnects both observers",async()=>{
+ const observers:{cb:(entries:unknown[])=>void; target?:Element; disconnect:ReturnType<typeof vi.fn<() => void>>}[]=[];
  const original=globalThis.ResizeObserver;
- globalThis.ResizeObserver=class{constructor(cb:(entries:unknown[])=>void){callbacks.push(cb);}observe(){}unobserve(){}disconnect(){}} as never;
+ globalThis.ResizeObserver=class{
+  record:{cb:(entries:unknown[])=>void; target?:Element; disconnect:ReturnType<typeof vi.fn<() => void>>};
+  constructor(cb:(entries:unknown[])=>void){this.record={cb,disconnect:vi.fn()};observers.push(this.record);}
+  observe(target:Element){this.record.target=target;} unobserve(){} disconnect(){this.record.disconnect();}
+ } as never;
  const rect=vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockReturnValue({width:600,height:0} as DOMRect);
- const height=vi.spyOn(HTMLElement.prototype,"offsetHeight","get").mockReturnValue(800);
+ let stageHeight=800;
+ const height=vi.spyOn(HTMLElement.prototype,"offsetHeight","get").mockImplementation(()=>stageHeight);
  try{
-  renderWithProviders(<AdminLayout><Look/></AdminLayout>);
+  const view=renderWithProviders(<AdminLayout><Look/></AdminLayout>);
   const preview=await screen.findByTestId("site-preview");
   const stage=preview.querySelector<HTMLElement>(".admin-preview-stage")!,viewport=preview.querySelector<HTMLElement>(".admin-preview-viewport")!;
+  const widthObserver=observers.find(o=>o.target===viewport)!,heightObserver=observers.find(o=>o.target===stage)!;
+  expect(widthObserver).toBeDefined();expect(heightObserver).toBeDefined();expect(widthObserver).not.toBe(heightObserver);
   expect(stage.style.width).toBe("1200px");expect(stage.style.transform).toBe("scale(0.5)");expect(viewport.style.height).toBe("400px");
   expect(preview).toHaveAttribute("aria-hidden","true");expect(preview).toHaveAttribute("inert");
-  act(()=>callbacks.forEach(cb=>cb([{contentRect:{width:300},target:viewport}])));
-  expect(stage.style.transform).toBe("scale(0.25)");
+  act(()=>widthObserver.cb([{contentRect:{width:300},target:viewport}]));
+  expect(stage.style.transform).toBe("scale(0.25)");expect(viewport.style.height).toBe("200px");
+  stageHeight=1200;
+  act(()=>heightObserver.cb([{contentRect:{height:1200},target:stage}]));
+  expect(stage.style.transform).toBe("scale(0.25)");expect(viewport.style.height).toBe("300px");
+  view.unmount();expect(widthObserver.disconnect).toHaveBeenCalledOnce();expect(heightObserver.disconnect).toHaveBeenCalledOnce();
  }finally{globalThis.ResizeObserver=original;rect.mockRestore();height.mockRestore();}
  expect(previewScale(900)).toBe(0.75);
 });
@@ -133,7 +144,16 @@ it("the 1200px preview stage is the cqw size container", async()=>{
  renderWithProviders(<AdminLayout><Look/></AdminLayout>);
  const preview=await screen.findByTestId("site-preview");
  const stage=preview.querySelector<HTMLElement>(".admin-preview-stage")!;
- expect(stage.querySelector(".site-shell")).not.toBeNull();expect(stage.style.width).toBe("1200px");
+ const shell=stage.querySelector(".site-shell")!;expect(shell).not.toBeNull();
+ // Relationship regression fixture: both classes exist but the old direct-child selector is dead.
+ expect(preview.matches(".admin-live-preview")).toBe(true);
+ expect(preview.querySelector(".admin-live-preview > .site-shell")).toBeNull();
+ const style=document.createElement("style");style.textContent=css;document.head.append(style);
+ try {
+  const selectors=Array.from(style.sheet!.cssRules).filter((rule):rule is CSSStyleRule=>"selectorText" in rule).map(rule=>rule.selectorText).filter(selector=>selector.includes(".site-shell"));
+  expect(selectors.length).toBeGreaterThan(0);
+  for(const selector of selectors)expect(preview.querySelector(selector),selector).toBe(shell);
+ }finally{style.remove();}expect(stage.style.width).toBe("1200px");
  expect(css).toMatch(/\.admin-preview-stage\{[^}]*container-type:inline-size/);
  expect(admin).not.toMatch(/\.admin-live-preview\s*\{[^}]*container-type/);
  expect(admin).not.toMatch(/\.admin-live-preview\s*>\s*\.site-shell/);
