@@ -16,6 +16,7 @@ export const siteCopy = {
   menuLabel: "Menu",
   menuOpen: "Index +",
   menuClose: "Close −",
+  a11y: { pauseMotion: "Pause motion", playMotion: "Play motion" },
   meta: { title: "Yazan Mohammad: AI Engineer", description: PROFILE_INTRO },
   dates: { since: "Since", until: "Until", jan: "Jan", feb: "Feb", mar: "Mar", apr: "Apr", may: "May", jun: "Jun", jul: "Jul", aug: "Aug", sep: "Sep", oct: "Oct", nov: "Nov", dec: "Dec" },
   mainNavLabel: "Main",

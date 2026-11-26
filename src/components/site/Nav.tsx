@@ -30,7 +30,7 @@ export function Nav({ sections, name = "" }: { sections: NavSection[]; name?: st
     <a className="skip-link" href="#top">{siteCopy.skipLink}</a>
     <a className="nav__logo" href="/#top">{name}</a>
     <button ref={toggle} className="nav__toggle" type="button" aria-expanded={open} aria-controls={id} onClick={()=>setOpen(!open)}>{open ? siteCopy.menuClose : siteCopy.menuOpen}</button>
-    <button className="nav__pause" type="button" aria-pressed={paused} onClick={()=>setMotionPaused(!paused)}>{paused ? "Play motion" : "Pause motion"}</button>
+    <button className="nav__pause" type="button" aria-pressed={paused} onClick={()=>setMotionPaused(!paused)}>{paused ? siteCopy.a11y.playMotion : siteCopy.a11y.pauseMotion}</button>
     <nav id={id} className={`nav__links${open ? " is-open" : ""}`} aria-label={siteCopy.mainNavLabel}>
       {sections.map(s=><a key={s.id} href={`#${s.id}`} aria-current={active === s.id ? "location" : undefined} onClick={()=>{if(open)toggle.current?.focus();setOpen(false);setActive(s.id);}}>{s.label}</a>)}
     </nav>

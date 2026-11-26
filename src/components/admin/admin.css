@@ -15,7 +15,6 @@
 @media(max-width:767px){.admin-save-slot .admin-savebar{padding:12px 18px;}}
 .admin-active :is(h1,h2,h3,h4), .admin-shell :is(h1,h2,h3,h4) {font-family:"Archivo",Arial,sans-serif;}
 .admin-main {max-width:1600px;width:100%;margin-inline:auto;padding:40px 40px 96px;}
-.admin-main > :is(div,section) > h1, .admin-main > section > header h1 {font-size:32px;line-height:1.15;letter-spacing:-.035em;margin-bottom:8px;font-weight:650;}
 .admin-sidebar {width:240px;background-color:#0c0c0c;border-color:#262626;}
 .admin-sidebar > div:first-child {height:76px;font-size:18px;gap:10px;}
 .admin-brand-mark {width:12px;height:12px;background:var(--p-accent);}
@@ -50,6 +49,8 @@
 .admin-page-header .admin-kicker{margin-bottom:8px;}
 .admin-page-header h1{font-size:32px;line-height:1.15;letter-spacing:-.035em;font-weight:650;margin:0;}
 .admin-page-header .admin-page-intro{margin:8px 0 0;}
+.admin-page-header__count{margin-left:12px;padding:2px 8px;border:1px solid #2a2a2a;font:500 12px/1.4 ui-monospace,monospace;color:#a3a3a3;vertical-align:middle;letter-spacing:0;}
+.admin-dashboard>.admin-page-header{margin-bottom:0;}
 .admin-page-header__actions{display:flex;gap:8px;flex-wrap:wrap;}
 @media(max-width:767px){.admin-page-header{flex-direction:column;align-items:stretch;}}
 @media(prefers-reduced-motion:reduce){.admin-active *{animation:none!important;transition:none!important;}}
@@ -85,7 +86,7 @@
 .admin-preview-panel {position:sticky;top:24px;min-width:0;border:1px solid #262626;background:#141414;padding:16px;overflow:hidden;}
 .admin-preview-panel > p {margin-bottom:14px;}
 .admin-live-preview {container-type:inline-size;overflow:hidden;pointer-events:none;position:relative;}
-.admin-live-preview > .site-shell {container-type:inline-size;contain:paint;width:1200px;transform-origin:top left;zoom:calc(100cqw / 1200px);}
+.admin-live-preview > .site-shell {container-type:inline-size;contain:paint;width:1200px;transform-origin:top left;}
 .admin-live-preview .site-shell .hero {min-height:650px;}
 .admin-live-preview .site-shell .hero h1 {font-size:12.35cqw;}
 .admin-live-preview .site-shell .drawing-grid {position:absolute;}
@@ -99,7 +100,7 @@
 .admin-live-preview .site-shell .name-letter {opacity:1;transform:none;}
 .admin-live-preview .site-shell .footer {margin-top:0;}
 .admin-dashboard-top {display:flex;justify-content:space-between;align-items:end;gap:20px;}
-.admin-dashboard-stats {display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #262626;margin:28px 0;}
+.admin-dashboard-stats {display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #262626;margin:4px 0 28px;}
 .admin-dashboard-stats > div {padding:24px;border-right:1px solid #262626;}
 .admin-dashboard-stats > div:last-child {border:0;}
 .admin-dashboard-stats a {display:flex;min-height:44px;align-items:center;}
@@ -122,6 +123,6 @@
 .admin-login form {background:#141414;border-color:#262626;padding:32px;}
 @media(max-width:767px){.admin-dashboard{grid-template-columns:1fr;}.admin-dashboard>h1,.admin-dashboard>div{grid-column:auto;}}
 @media(max-width:1000px){.admin-main {padding:28px 24px 80px;}.admin-look-layout,.admin-dashboard-grid{grid-template-columns:1fr;}.admin-preview-panel{position:relative;top:0;}.admin-sidebar{width:210px;}}
-@media(max-width:767px){.admin-main{padding:28px 18px 80px;}.admin-topbar{padding-inline:12px;min-height:64px;}.admin-last-saved{font-size:10px;margin-left:auto;text-align:right;}.admin-last-saved time{margin-left:6px;}.admin-brand-inline{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;}.admin-text-layout{grid-template-columns:1fr;gap:12px;}.admin-section-rail{position:relative;top:0;flex-direction:row;overflow-x:auto;max-width:100%;padding-bottom:8px;}.admin-section-rail button{white-space:nowrap;gap:12px;border-left:0;border-bottom:2px solid transparent;}.admin-active fieldset{padding:18px;}.admin-savebar{bottom:0;gap:8px;}.admin-savebar::after{display:none;}.admin-savebar button{min-width:44px;}.admin-savebar >span{font-size:12px;}.admin-copy-input{gap:8px;}.admin-copy-input button{padding-inline:12px;}.admin-dashboard-stats>div{padding:12px;}.admin-dashboard-stats strong{font-size:36px;}.admin-dashboard-stats .admin-kicker{font-size:9px;letter-spacing:0;}.admin-dashboard-top{display:block;}.admin-quick-links{grid-template-columns:1fr;}.admin-visibility>span{display:none;}.admin-list-row{flex-wrap:wrap;gap:8px!important;}.admin-list-thumb{width:44px;height:44px;}.admin-reorder{flex-direction:row;}.admin-reorder button{width:44px;height:44px;}.admin-main :is(button,a[role=button]){min-height:44px;}.admin-live-preview > .site-shell {width:1000px;zoom:calc(100cqw / 1000px);}}
+@media(max-width:767px){.admin-last-saved{display:none;}.admin-main{padding:28px 18px 80px;}.admin-topbar{padding-inline:12px;min-height:64px;}.admin-last-saved{font-size:10px;margin-left:auto;text-align:right;}.admin-last-saved time{margin-left:6px;}.admin-brand-inline{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;}.admin-text-layout{grid-template-columns:1fr;gap:12px;}.admin-section-rail{position:relative;top:0;flex-direction:row;overflow-x:auto;max-width:100%;padding-bottom:8px;}.admin-section-rail button{white-space:nowrap;gap:12px;border-left:0;border-bottom:2px solid transparent;}.admin-active fieldset{padding:18px;}.admin-savebar{bottom:0;gap:8px;}.admin-savebar::after{display:none;}.admin-savebar button{min-width:44px;}.admin-savebar >span{font-size:12px;}.admin-copy-input{gap:8px;}.admin-copy-input button{padding-inline:12px;}.admin-dashboard-stats>div{padding:12px;}.admin-dashboard-stats strong{font-size:36px;}.admin-dashboard-stats .admin-kicker{font-size:9px;letter-spacing:0;}.admin-dashboard-top{display:block;}.admin-quick-links{grid-template-columns:1fr;}.admin-visibility>span{display:none;}.admin-list-row{flex-wrap:wrap;gap:8px!important;}.admin-list-thumb{width:44px;height:44px;}.admin-reorder{flex-direction:row;}.admin-reorder button{width:44px;height:44px;}.admin-main :is(button,a[role=button]){min-height:44px;}}
 @media(max-width:767px){.admin-main [role=button],.admin-main a.inline-flex,.admin-main a[href^="/api/files"],.admin-active [role=dialog] button,.admin-active [role=dialog] a.inline-flex{min-height:44px;} .admin-active [role=dialog] button[role=switch]{min-height:20px;} .admin-active [role=dialog]>button{min-height:44px;min-width:44px;top:4px;right:4px;}}
 

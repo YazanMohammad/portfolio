@@ -223,6 +223,10 @@
       "menuLabel": "Menu",
       "menuOpen": "Index +",
       "menuClose": "Close −",
+      "a11y": {
+        "pauseMotion": "Pause motion",
+        "playMotion": "Play motion"
+      },
       "meta": {
         "title": "Yazan Mohammad: AI Engineer",
         "description": "I'm an AI Engineer in Jordan. I write web apps with React and ASP.NET Core, and work with LLMs."

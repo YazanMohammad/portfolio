@@ -1,7 +1,7 @@
 /* Admin Site text, Look and preview. */
 .admin-preview-viewport{position:relative;width:100%;overflow:hidden;}
 .admin-preview-stage{transform-origin:top left;}
-.admin-live-preview .admin-preview-stage > .site-shell{width:1200px;zoom:normal;}
+.admin-live-preview .admin-preview-stage > .site-shell{width:1200px;}
 .admin-field-count{margin:0 0 4px;}
 .admin-section-rail button[aria-selected=true]{color:var(--p-accent);border-color:var(--p-accent);background:#141414;}
 .admin-look-card{border:1px solid #262626;background:#141414;padding:24px;}

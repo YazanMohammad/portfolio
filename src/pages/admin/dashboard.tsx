@@ -1,4 +1,5 @@
 import { DashboardOverview } from "@/components/admin/DashboardOverview";
+import { PageHeader } from "@/components/admin/PageHeader";
 import type { FillInItem } from "@shared/index";
 import { format, formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
@@ -16,7 +17,7 @@ function DashboardSkeleton() {
   const line = "h-5 rounded bg-muted";
   return (
     <div className="space-y-6 font-sans text-sm text-foreground" aria-busy="true">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <PageHeader kicker="Site" title="Dashboard" intro="Overview of your site." />
       <p role="status" className="sr-only">Loading dashboard</p>
       <section aria-labelledby="dashboard-messages" className={panelClass}>
         <h2 id="dashboard-messages" className="font-semibold">Messages</h2>
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
   const summary = useAdminSummary();
   if (summary.isError) return (
     <div className="space-y-6 font-sans text-sm text-foreground">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <PageHeader kicker="Site" title="Dashboard" intro="Overview of your site." />
       <div className={panelClass}>
         <p role="alert">Could not load dashboard.</p>
         <button type="button" className={`mt-4 h-9 border border-border px-4 ${linkClass}`} onClick={() => void summary.refetch()}>Try again</button>
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
   const recent = data.recentMessages.filter((m) => !m.isRead).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 3);
   return (
     <div className="admin-dashboard space-y-6 font-sans text-sm text-foreground">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <PageHeader kicker="Site" title="Dashboard" intro="Overview of your site." />
       <DashboardOverview unread={data.unreadCount}/>
       <section aria-labelledby="dashboard-messages" className={panelClass}>
         <h2 id="dashboard-messages" className="font-semibold">Messages</h2>

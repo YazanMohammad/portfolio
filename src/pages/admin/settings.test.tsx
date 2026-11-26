@@ -86,11 +86,11 @@ it("Site text groups are a tablist with arrow keys and a labelled panel",async()
 it("announces the field count in a polite live region, with and without a search",async()=>{
  renderWithProviders(<AdminLayout><SiteText/></AdminLayout>);
  const search=await screen.findByRole("searchbox",{name:"Find site text"});
- const status=screen.getByText(/^\d+ fields$/);expect(status).toHaveAttribute("aria-live","polite");expect(status).toHaveAttribute("role","status");
+ const status=screen.getByRole("status",{name:"Field count"});expect(status).toHaveAttribute("aria-live","polite");expect(status).toHaveAttribute("role","status");
  expect(status.textContent).toBe(`${Object.keys(copyFields).length} fields`);
  fireEvent.change(search,{target:{value:"Work heading"}});
- expect(screen.getByRole("status",{name:""})).toHaveTextContent(/^\d+ fields? match(es)?$/);
- fireEvent.change(search,{target:{value:"zzzz-none"}});expect(screen.getByText("0 fields match")).toBe(status);
+ expect(screen.getByRole("status",{name:"Field count"})).toHaveTextContent(/^\d+ fields? match(es)?$/);
+ fireEvent.change(search,{target:{value:"zzzz-none"}});expect(status).toHaveTextContent("0 fields match");
 });
 it("Look: hero shape is a radio group, toggles are described switches",async()=>{
  renderWithProviders(<AdminLayout><Look/></AdminLayout>);

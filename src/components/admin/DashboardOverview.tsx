@@ -7,7 +7,7 @@ export function DashboardOverview({unread}:{unread:number}) {
  const rows=Array.isArray(projects.data)?projects.data:[];
  const failed=projects.isError;
  const shown=rows.filter(p=>p.isVisible).length,hidden=rows.length-shown;
- return <div><p className="admin-page-intro">Overview of your site.</p>{failed&&<p role="alert" className="text-destructive">Could not load projects. <button type="button" className="underline" onClick={()=>void projects.refetch()}>Try again</button></p>}<div className="admin-dashboard-stats">
+ return <div>{failed&&<p role="alert" className="text-destructive">Could not load projects. <button type="button" className="underline" onClick={()=>void projects.refetch()}>Try again</button></p>}<div className="admin-dashboard-stats">
  <div><p className="admin-kicker">Projects shown</p><strong aria-label={failed?'Projects shown unavailable':`${shown} projects shown`}>{projects.isPending||failed?'—':shown}</strong><p className="text-muted-foreground">On the public site</p></div>
  <div><p className="admin-kicker">Projects hidden</p><strong aria-label={failed?'Projects hidden unavailable':`${hidden} projects hidden`}>{projects.isPending||failed?'—':hidden}</strong><p className="text-muted-foreground">Not on the site</p></div>
  <div><p className="admin-kicker">Unread messages</p><strong aria-label={`${unread} unread messages`}>{unread}</strong><GuardedLink to="/admin/messages" className="underline">Open inbox</GuardedLink></div>

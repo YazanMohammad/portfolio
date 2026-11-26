@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -175,15 +176,15 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
 
   return (
     <section aria-labelledby="list-title" className="space-y-4">
-      <header className="flex items-center justify-between gap-3">
-        <h1 id="list-title" ref={headingRef} tabIndex={-1} className="text-lg font-semibold text-foreground outline-none">
-          {title}
-          {list.data && <span className="ml-2 text-sm font-normal text-muted-foreground">{rows.length}</span>}
-        </h1>
-        {rows.length > 0 && addButton}
-      </header>
-
-      <p className="admin-page-intro">{collection === "projects" ? "Hidden projects stay off the site." : "Use the arrows to change the order."}</p>
+      <PageHeader
+        kicker="Content"
+        title={title}
+        titleId="list-title"
+        titleRef={headingRef}
+        count={list.data ? rows.length : undefined}
+        intro={collection === "projects" ? "Hidden projects stay off the site." : "Use the arrows to change the order."}
+        actions={rows.length > 0 ? addButton : undefined}
+      />
       {list.isPending && <p className="text-sm text-muted-foreground">Loading…</p>}
       {list.isError && (
         <p role="alert" className="text-sm text-destructive">

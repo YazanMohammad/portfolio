@@ -6,6 +6,7 @@ import type { z } from "zod";
 import { ProfileInput, type Profile } from "@shared/index";
 import { useAdminProfile, useSaveProfile } from "@/lib/admin/queries";
 import { applyServerError } from "@/components/admin/form/server-errors";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { SaveBar } from "@/components/admin/form/SaveBar";
 import { SwitchField, TextField, TextareaField } from "@/components/admin/form/FormField";
 import { ImageDropZone } from "@/components/admin/form/ImageDropZone";
@@ -101,8 +102,7 @@ export default function AdminProfile() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-foreground">Profile</h1>
-      <p className="admin-page-intro">The introduction, links and files people see on your site.</p>
+      <PageHeader kicker="Content" title="Profile" intro="The introduction, links and files people see on your site."/>
       {query.isError && (
         <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-destructive">
           <p>Could not refresh the profile. Your edits are still here.</p>
