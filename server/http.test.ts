@@ -128,3 +128,21 @@ it("readJson cap counts UTF-8 bytes and accepts a larger per-route cap", async (
   await expect(readJson(request(body), schema)).rejects.toMatchObject({ code: "too_large" });
   expect((await readJson(request(body), schema, 128 * 1024)).name).toHaveLength(30000);
 });
+
+function bodyReq(headers: Record<string, string>, body = "{}") {
+  return new Request("https://example.com/api", { method: "POST", headers, body });
+}
+const anySchema = z.object({}).passthrough();
+
+it("readJson rejects over-cap Content-Length without reading the body", async () => {
+  const r = bodyReq({ "content-length": "100" });
+  const spy = vi.spyOn(r, "text");
+  await expect(readJson(r, anySchema, 10)).rejects.toMatchObject({ code: "too_large", status: 413 });
+  expect(spy).not.toHaveBeenCalled();
+});
+
+it.each([["missing", undefined], ["invalid", "abc"], ["negative", "-5"]])("readJson with %s Content-Length falls through to the body cap", async (_n, value) => {
+  const headers: Record<string, string> = value === undefined ? {} : { "content-length": value };
+  await expect(readJson(bodyReq(headers, JSON.stringify({ a: "x".repeat(50) })), anySchema, 10)).rejects.toMatchObject({ code: "too_large", status: 413 });
+  await expect(readJson(bodyReq(headers), anySchema, 10)).resolves.toEqual({});
+});
