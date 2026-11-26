@@ -62,7 +62,7 @@ export default function AdminDashboard() {
   );
   if (!summary.data) return <DashboardSkeleton />;
   const data = summary.data;
-  const recent = [...data.recentMessages].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 3);
+  const recent = data.recentMessages.filter((m) => !m.isRead).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 3);
   return (
     <div className="admin-dashboard space-y-6 font-sans text-sm text-foreground">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -70,11 +70,11 @@ export default function AdminDashboard() {
       <section aria-labelledby="dashboard-messages" className={panelClass}>
         <h2 id="dashboard-messages" className="font-semibold">Messages</h2>
         <p className="mt-2 text-muted-foreground">{data.unreadCount ? `${data.unreadCount} unread` : "No unread messages"}</p>
-        {!recent.length && <p className="mt-4 text-muted-foreground">No messages yet.</p>}
+        {!recent.length && <p className="mt-4 text-muted-foreground">{data.unreadCount ? "Open the inbox to read them." : "No messages yet."}</p>}
         <ul className="mt-4 divide-y divide-border">
           {recent.map((message) => (
             <li key={message.id}>
-              <GuardedLink to={`/admin/messages?open=${message.id}`} className={`block min-w-0 space-y-1 py-3 ${linkClass}`}>
+              <GuardedLink to={`/admin/messages?open=${message.id}`} className={`block min-h-11 min-w-0 space-y-1 py-3 ${linkClass}`}>
                 <span className="block break-words font-medium">{message.name}</span>{" "}
                 <span className="block break-words">{message.subject || "(no subject)"}</span>{" "}
                 <time dateTime={message.createdAt} className="block text-muted-foreground">

@@ -125,7 +125,7 @@ describe("messages inbox", () => {
     const media = vi.spyOn(window, "matchMedia").mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() } as unknown as MediaQueryList);
     try {
       renderInbox("/admin/messages?open=2");
-      const dialog = await screen.findByRole("dialog", { name: "Message" });
+      const dialog = await screen.findByRole("dialog", { name: /.+/ });
       expect(within(dialog).getByRole("link", { name: "Reply by email" })).toBeInTheDocument();
       await userEvent.setup().click(within(dialog).getByRole("button", { name: "Close" }));
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());

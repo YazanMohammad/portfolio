@@ -67,7 +67,7 @@ function CacheProbe() {
 }
 const cache = () => JSON.parse(screen.getByTestId("cache").textContent ?? "null") as Item[];
 
-function setup(path = "/admin/projects") {
+function setup(path = "/admin/projects", probe = true) {
   vi.mocked(apiGet).mockImplementation((async (url: string) => {
     if (url === "/api/admin/summary") return summary;
     return list;
@@ -75,7 +75,7 @@ function setup(path = "/admin/projects") {
   return renderWithProviders(
     <AdminLayout>
       <ListEditor config={config} />
-      <CacheProbe />
+      {probe && <CacheProbe />}
     </AdminLayout>,
     { path },
   );
@@ -111,7 +111,7 @@ describe("ListEditor", () => {
   it("empty state shows copy and an Add button", async () => {
     list = [];
     setup();
-    expect(await screen.findByText("No Projects yet.")).toBeInTheDocument();
+    expect(await screen.findByText("No projects yet.")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Add project" }).length).toBeGreaterThan(0);
   });
 
@@ -120,6 +120,40 @@ describe("ListEditor", () => {
     await openMenu("Alpha");
     await userEvent.click(await screen.findByRole("menuitem", { name: "Move down" }));
     await waitFor(() => expect(sends()).toContainEqual(["PUT", "/api/admin/projects/order", { ids: [2, 1, 3] }]));
+  });
+
+  it("disables the arrows while a reorder runs and refetches the list after it fails", async () => {
+    // No cache probe here: its skipToken observer would stop the invalidate from refetching.
+    setup("/admin/projects", false);
+    await screen.findByText("Alpha");
+    let reject!: (e: Error) => void;
+    vi.mocked(apiSend).mockImplementationOnce(() => new Promise((_, rej) => (reject = rej)) as never);
+    const gets = () => vi.mocked(apiGet).mock.calls.filter(([u]) => u === "/api/admin/projects").length;
+    const before = gets();
+    await userEvent.click(screen.getByRole("button", { name: "Move Alpha down" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Move Beta down" })).toBeDisabled());
+    expect(screen.getByRole("button", { name: "Move Gamma up" })).toBeDisabled();
+    reject(new ApiRequestError("Nope", 500, "server"));
+    await waitFor(() => expect(gets()).toBeGreaterThan(before));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Move Beta down" })).toBeEnabled());
+    expect(rowTexts()[0]).toContain("Alpha");
+  });
+
+  it("returns focus to the Actions button after the delete dialog closes", async () => {
+    setup();
+    await openMenu("Beta");
+    await userEvent.click(await screen.findByRole("menuitem", { name: "Delete" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Actions for Beta" })).toHaveFocus());
+  });
+
+  it("returns focus to the row after the edit sheet closes", async () => {
+    setup();
+    await userEvent.click((await screen.findByText("Alpha")).closest("button")!);
+    await screen.findByRole("dialog");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    await waitFor(() => expect(screen.getByText("Alpha").closest("button")).toHaveFocus());
   });
 
   it("reorder failure shows the optimistic order, then restores the exact previous order and sortOrder", async () => {

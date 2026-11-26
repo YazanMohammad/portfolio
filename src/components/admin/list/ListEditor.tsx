@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useLocation, useSearch } from "wouter";
 import {
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAdminList, useAdminSummary, useDeleteItem, useReorder, useSaveItem } from "@/lib/admin/queries";
 import { useGuardedAction } from "@/lib/admin/unsaved";
+import "../lists.css";
 import { EditPanel } from "./EditPanel";
 import { moveId, nextSortOrder } from "./reorder";
 import { SortableRow } from "./SortableRow";
@@ -38,6 +40,13 @@ function samePanel(a: Panel, b: Panel): boolean {
   return a.kind === b.kind && (a.kind === "new" || (b.kind === "edit" && a.id === b.id));
 }
 
+const emptyText: Record<string, string> = {
+  projects: "No projects yet.",
+  experience: "No jobs yet.",
+  education: "No education yet.",
+  skills: "No skills yet.",
+};
+
 export function ListEditor<T extends Row, I>({ config }: { config: CollectionConfig<T, I> }) {
   const { collection, title, singular } = config;
   const list = useAdminList<T>(collection);
@@ -45,7 +54,10 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
   const save = useSaveItem<T, I>(collection);
   const remove = useDeleteItem(collection);
   const reorder = useReorder(collection);
+  const qc = useQueryClient();
   const guarded = useGuardedAction();
+  const returnFocus = useRef<HTMLElement | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const [location, navigate] = useLocation();
   const search = useSearch();
 
@@ -65,9 +77,17 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
   };
 
   // User actions: ask first when the open panel is dirty.
-  const open = (next: Panel) => {
+  const open = (next: Panel, trigger?: HTMLElement | null) => {
     if (samePanel(next, panelRef.current)) return;
+    returnFocus.current = trigger ?? (document.activeElement as HTMLElement | null);
     guarded(() => apply(next));
+  };
+  // Menu items are gone by the time a dialog closes, so Radix cannot return focus to them.
+  // Send focus to the saved trigger, or to the page heading when its row no longer exists.
+  const restoreFocus = (event: Event) => {
+    event.preventDefault();
+    const el = returnFocus.current;
+    (el && el.isConnected ? el : headingRef.current)?.focus();
   };
   const close = () => apply(null);
 
@@ -99,7 +119,15 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
       from,
       to,
     );
-    reorder.mutate({ ids }, { onError: () => toast.error("Could not save the new order.") });
+    if (reorder.isPending) return;
+    reorder.mutate(
+      { ids },
+      {
+        onError: () => toast.error("Could not save the new order."),
+        // Success or failure, show the order the server has.
+        onSettled: () => void qc.invalidateQueries({ queryKey: ["admin", collection] }),
+      },
+    );
   };
 
   const toggleVisible = (item: T, visible: boolean) => {
@@ -139,7 +167,7 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
   const sheetOpen = panel?.kind === "new" || (panel?.kind === "edit" && editing !== null);
 
   const addButton = (
-    <Button type="button" onClick={() => open({ kind: "new" })}>
+    <Button type="button" onClick={(e) => open({ kind: "new" }, e.currentTarget)}>
       <Plus className="mr-1 h-4 w-4" aria-hidden />
       Add {singular}
     </Button>
@@ -148,14 +176,14 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
   return (
     <section aria-labelledby="list-title" className="space-y-4">
       <header className="flex items-center justify-between gap-3">
-        <h1 id="list-title" className="text-lg font-semibold text-foreground">
+        <h1 id="list-title" ref={headingRef} tabIndex={-1} className="text-lg font-semibold text-foreground outline-none">
           {title}
           {list.data && <span className="ml-2 text-sm font-normal text-muted-foreground">{rows.length}</span>}
         </h1>
         {rows.length > 0 && addButton}
       </header>
 
-      <p className="admin-page-intro">{collection === "projects" ? "Show the work you want people to see. Keep drafts hidden until they are ready." : "Keep the details current. Use the arrows to change the order on your site."}</p>
+      <p className="admin-page-intro">{collection === "projects" ? "Hidden projects stay off the site." : "Use the arrows to change the order."}</p>
       {list.isPending && <p className="text-sm text-muted-foreground">Loading…</p>}
       {list.isError && (
         <p role="alert" className="text-sm text-destructive">
@@ -168,7 +196,7 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
 
       {list.data && rows.length === 0 && (
         <div className="flex flex-col items-start gap-3 border-y border-border py-6">
-          <p className="text-sm text-muted-foreground">No {title} yet.</p>
+          <p className="text-sm text-muted-foreground">{emptyText[collection]}</p>
           {addButton}
         </div>
       )}
@@ -188,12 +216,16 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
                   toFillIn={fillIn.has(item.id)}
                   isFirst={i === 0}
                   isLast={i === rows.length - 1}
-                  onOpen={() => open({ kind: "edit", id: item.id })}
+                  reordering={reorder.isPending}
+                  onOpen={(t) => open({ kind: "edit", id: item.id }, t)}
                   onToggleVisible={(v) => toggleVisible(item, v)}
                   onMoveUp={() => move(i, i - 1)}
                   onMoveDown={() => move(i, i + 1)}
                   onDuplicate={() => duplicate(item)}
-                  onDelete={() => setToDelete(item)}
+                  onDelete={(t) => {
+                    returnFocus.current = t ?? null;
+                    setToDelete(item);
+                  }}
                 />
               ))}
             </ul>
@@ -201,7 +233,7 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
       )}
 
       <Sheet open={sheetOpen} onOpenChange={(o) => !o && guarded(close)}>
-        <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-xl">
+        <SheetContent side="right" onCloseAutoFocus={restoreFocus} className="admin-edit-sheet flex w-full flex-col gap-0 p-0 sm:max-w-xl">
           <SheetHeader className="border-b border-border px-4 py-3">
             <SheetTitle>{editing ? `Edit ${singular}` : `Add ${singular}`}</SheetTitle>
             <SheetDescription className="sr-only">
@@ -221,7 +253,7 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
       </Sheet>
 
       <AlertDialog open={toDelete !== null} onOpenChange={(o) => !o && setToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {toDelete ? `Delete ${config.rowTitle(toDelete)}? This cannot be undone.` : ""}
@@ -230,7 +262,7 @@ export function ListEditor<T extends Row, I>({ config }: { config: CollectionCon
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete {singular}</AlertDialogAction>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDelete}>Delete {singular}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

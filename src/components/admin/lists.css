@@ -1,0 +1,15 @@
+/* Lists, dashboard and inbox. Loaded with the components that use it. */
+.admin-list-row .admin-visibility { position: relative; min-height: 44px; min-width: 44px; justify-content: flex-end; }
+.admin-list-row .admin-visibility button[role="switch"] { min-height: 24px; }
+.admin-list-row .admin-visibility button[role="switch"]::after { content: ""; position: absolute; inset: 0; }
+.admin-list-row .admin-reorder button:disabled { opacity: 0.35; }
+.admin-message { line-height: 1.6; }
+.admin-message .whitespace-pre-wrap { margin-top: 4px; }
+.admin-message-sheet { padding: 20px; }
+@media (max-width: 767px) {
+  .admin-list-row .admin-row-actions { width: 44px; height: 44px; }
+  .admin-inbox-tabs [role="tab"] { min-height: 44px; min-width: 44px; padding-inline: 16px; }
+  /* Keep the focus ring inside the sheet: no clipping by the scroll container. */
+  .admin-message-sheet > button[class*="absolute"] { top: 8px; right: 8px; width: 44px; height: 44px; display: grid; place-items: center; }
+  .admin-message-sheet > button[class*="absolute"]:focus-visible { outline: 2px solid var(--p-accent, currentColor); outline-offset: -4px; box-shadow: none; }
+}

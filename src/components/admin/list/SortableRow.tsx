@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import "../lists.css";
 import { ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,25 +22,31 @@ type Props = {
   toFillIn: boolean;
   isFirst: boolean;
   isLast: boolean;
-  onOpen: () => void;
+  /** True while a reorder save runs: the arrows wait so moves never overlap. */
+  reordering?: boolean;
+  /** `trigger` is the element focus returns to when the panel or dialog closes. */
+  onOpen: (trigger?: HTMLElement | null) => void;
   onToggleVisible: (visible: boolean) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDuplicate: () => void;
-  onDelete: () => void;
+  onDelete: (trigger?: HTMLElement | null) => void;
 };
 
 export function SortableRow(p: Props) {
+  const openRef = useRef<HTMLButtonElement>(null);
+  const actionsRef = useRef<HTMLButtonElement>(null);
   const [failedImage,setFailedImage]=useState<string|null>(null);
   return (
     <li
       className="admin-list-row group relative flex min-h-11 items-center gap-2 border-b border-border bg-background px-2"
     >
-      <div className="admin-reorder"><button type="button" aria-label={`Move ${p.title} up`} disabled={p.isFirst} onClick={p.onMoveUp}><ArrowUp size={14} aria-hidden="true"/></button><button type="button" aria-label={`Move ${p.title} down`} disabled={p.isLast} onClick={p.onMoveDown}><ArrowDown size={14} aria-hidden="true"/></button></div>
+      <div className="admin-reorder"><button type="button" aria-label={`Move ${p.title} up`} disabled={p.isFirst || p.reordering} onClick={p.onMoveUp}><ArrowUp size={14} aria-hidden="true"/></button><button type="button" aria-label={`Move ${p.title} down`} disabled={p.isLast || p.reordering} onClick={p.onMoveDown}><ArrowDown size={14} aria-hidden="true"/></button></div>
       {p.thumbnail&&failedImage!==p.thumbnail&&<img className="admin-list-thumb" src={p.thumbnail} alt="" onError={()=>setFailedImage(p.thumbnail??null)}/>}
       <button
+        ref={openRef}
         type="button"
-        onClick={p.onOpen}
+        onClick={() => p.onOpen(openRef.current)}
         className="flex min-h-11 min-w-0 flex-1 flex-col justify-center rounded-sm py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="truncate text-sm font-medium text-foreground">{p.title}</span>
@@ -57,21 +64,21 @@ export function SortableRow(p: Props) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label={`Actions for ${p.title}`}>
+          <Button ref={actionsRef} variant="ghost" size="icon" className="admin-row-actions h-9 w-9" aria-label={`Actions for ${p.title}`}>
             <MoreHorizontal className="h-4 w-4" aria-hidden />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={p.onOpen}>Edit</DropdownMenuItem>
-          <DropdownMenuItem disabled={p.isFirst} onSelect={p.onMoveUp}>
+          <DropdownMenuItem onSelect={() => p.onOpen(actionsRef.current)}>Edit</DropdownMenuItem>
+          <DropdownMenuItem disabled={p.isFirst || p.reordering} onSelect={p.onMoveUp}>
             Move up
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={p.isLast} onSelect={p.onMoveDown}>
+          <DropdownMenuItem disabled={p.isLast || p.reordering} onSelect={p.onMoveDown}>
             Move down
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={p.onDuplicate}>Duplicate</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={p.onDelete}>
+          <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => p.onDelete(actionsRef.current)}>
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
