@@ -9,19 +9,21 @@
 3. Leave the build settings as they are. They come from `netlify.toml`:
    build `pnpm install --frozen-lockfile && pnpm build`, publish `dist`, Node 22.
 4. Set the environment variables below. Give each one the scopes **Builds** and **Functions**.
-5. Run the production migration and seed (see below), then deploy.
+5. Run the production migration and seed, then create the admin account (see below). Then deploy.
 6. Add the custom domain: `www.yznmoh.com` as primary, `yznmoh.com` as an alias. Wait for HTTPS.
 
 ## Environment variables
 
 Set these in **Site configuration → Environment variables**. Names only here. Keep the values secret.
 
-| Name | What it is |
-|---|---|
-| `DATABASE_URL` | Neon main branch, **pooled** connection string (the host contains `-pooler`) |
-| `ADMIN_PASSWORD_HASH` | scrypt hash of the admin password. Make it locally with `pnpm admin:hash` and paste the whole `scrypt$…` string |
-| `SESSION_SECRET` | Base64 of 32 random bytes. Make it with the command below. It also keys the IP hash for rate limits |
-| `SITE_ORIGIN` | The exact production origin: `https://www.yznmoh.com`. No trailing slash |
+| Name | Secret? | What it is |
+|---|---|---|
+| `DATABASE_URL` | Secret | Neon main branch, **pooled** connection string (the host contains `-pooler`) |
+| `SESSION_SECRET` | Secret | Base64 of 32 random bytes. Make it with the command below. It also keys the IP hash for rate limits |
+| `SITE_ORIGIN` | Not secret | The exact production origin: `https://www.yznmoh.com`. No trailing slash |
+
+These three are all. The admin username and password are not env variables: they are stored in the
+database (see **Admin account** below). If an old `ADMIN_PASSWORD_HASH` is still set in Netlify, delete it.
 
 Make `SESSION_SECRET` with:
 
@@ -58,6 +60,32 @@ Run these on your own machine, not on Netlify. Put the values in the local `.env
 
 Other local-only names: `DATABASE_URL_TEST` and `DATABASE_URL_TEST_UNPOOLED` for `pnpm test:db`.
 
+## Admin account
+
+The admin login (username and password) lives in the `admin_account` table. Create it once, from your
+own computer, after the migration:
+
+1. In the local `.env`, set `DATABASE_URL` to the Neon **main** branch URL (the same one Netlify uses).
+   The command reads `.env`, and `.env` wins over a `DATABASE_URL` set in your shell.
+2. In PowerShell, from the repo folder, run:
+
+   ```powershell
+   .\node_modules\.bin\tsx.cmd server\bin\admin-account.ts
+   ```
+
+   (`pnpm admin:create` does the same if pnpm is on your PATH.)
+3. Type a username (3 to 64 characters), then the password twice (at least 12 characters; nothing
+   shows while you type). It prints `Admin account saved.`
+4. Log in at `https://www.yznmoh.com/admin` with that username (case does not matter) and password.
+
+You can change the username or password later on the admin **Account** page. Saving there logs out
+every other browser.
+
+**Forgot the password?** Run the same command again. It replaces the account and logs out every session.
+
+Until an account exists, every login answers "Wrong username or password." and the function log says
+`No admin account. Run admin:create.`
+
 ## Local check
 
 ```bash
@@ -76,6 +104,7 @@ pnpm dev        # netlify dev on http://localhost:8888, runs Vite on 5173
 |---|---|
 | `Missing environment variable: X` in a function | Add `X` in Netlify with the Functions scope and redeploy |
 | Login or contact form returns 500 | Check `SESSION_SECRET` is base64 of 32 bytes. The function log names it |
+| Login always says "Wrong username or password." | No admin account yet, or a typo. Run the admin account command again (see **Admin account**) |
 | Admin save or contact form returns 403 | You are on a `*.netlify.app` URL, or `SITE_ORIGIN` is not exact |
 | `/api/...` returns HTML | Check the `/api/*` redirect is before `/*` in `netlify.toml` |
 | Page 404 on refresh | Check the `/* → /index.html` redirect is last |

@@ -28,7 +28,7 @@ env -u DATABASE_URL pnpm dev   # use this if your shell already exports DATABASE
 | `pnpm db:migrate` | Apply migrations. Uses `DATABASE_URL_UNPOOLED` |
 | `pnpm db:migrate:test` | Apply migrations to the test branch |
 | `pnpm db:seed` | Seed profile, projects and files |
-| `pnpm admin:hash` | Make the value for `ADMIN_PASSWORD_HASH` |
+| `pnpm admin:create` | Create or replace the admin login in the database (`.env` `DATABASE_URL`). Also ends every admin session |
 
 ## Layout
 
@@ -42,7 +42,7 @@ env -u DATABASE_URL pnpm dev   # use this if your shell already exports DATABASE
 
 `pnpm test` runs the unit and component tests (no backend needed).
 
-`pnpm e2e` runs the Playwright smoke test in `e2e/`. It needs `netlify dev` running and `E2E_ADMIN_PASSWORD` set, and skips otherwise. It uses the installed Chrome (`channel: "chrome"`), so no browser download is needed. Run it against a test database, not production: it edits a project and sends a contact message, then restores and deletes them.
+`pnpm e2e` runs the Playwright smoke test in `e2e/`. It needs `netlify dev` running and `E2E_ADMIN_USERNAME` and `E2E_ADMIN_PASSWORD` set (an account made with `pnpm admin:create` on the test database), and skips otherwise. It uses the installed Chrome (`channel: "chrome"`), so no browser download is needed. Run it against a test database, not production: it edits a project and sends a contact message, then restores and deletes them.
 
 ## Deploy
 
