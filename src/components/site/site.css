@@ -88,7 +88,8 @@
 .site-shell .timeline__group + .timeline__group { margin-top: 48px; }
 .site-shell .rows { list-style: none; }
 .site-shell .rows > li { border-top: 1px solid var(--line); padding: 24px 0; display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
-.site-shell .rows__date { font-size: 14.4px; line-height: 1.6; color: var(--muted); max-width: 13ch; }
+.site-shell .rows__date { font-size: 14.4px; line-height: 1.6; color: var(--muted); }
+.site-shell .date-nowrap { white-space: nowrap; }
 .site-shell .rows h4 { font-size: 22.5px; }
 .site-shell .timeline__meta { margin-top: 8px; font-size: 16px; color: var(--muted); }
 .site-shell .timeline__bullets { margin-top: 20px; list-style: none; font-size: 16px; }
