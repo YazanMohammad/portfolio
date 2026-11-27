@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { getStore } from "@netlify/blobs";
 import { fileKey, type UploadResult } from "../shared/index";
+import { saveLocalFile, getLocalFile, deleteLocalFile } from "./filesystem";
 
 const STORE = "files";
 const EXTENSIONS = new Set(["jpg", "png", "webp", "pdf"]);
@@ -26,18 +27,20 @@ export async function saveFile(bytes: Uint8Array, ext: string, contentType: stri
   const key = newFileKey(ext);
   // Copy into a plain ArrayBuffer so only these bytes are stored, not a larger backing buffer.
   const data = new Uint8Array(bytes).buffer; // copies only the view's bytes
-  await filesStore().set(key, data, { metadata: { contentType } });
+  if (process.env.FILES_DIR) await saveLocalFile(key, bytes, contentType);
+  else await filesStore().set(key, data, { metadata: { contentType } });
   return { key, url: `/api/files/${key}`, contentType, size: bytes.byteLength };
 }
 
-export async function getFile(key: string): Promise<{ bytes: ArrayBuffer; contentType: string } | null> {
+export async function getFile(key: string): Promise<{ bytes: ArrayBuffer; contentType: string; size: number } | null> {
   // Check the key before any store call: no path tricks reach the store.
   if (!isFileKey(key)) return null;
+  if (process.env.FILES_DIR) return getLocalFile(key);
   const result = await filesStore().getWithMetadata(key, { type: "arrayBuffer" });
   if (!result) return null;
   const stored = result.metadata?.contentType;
   const contentType = typeof stored === "string" && stored !== "" ? stored : "application/octet-stream";
-  return { bytes: result.data, contentType };
+  return { bytes: result.data, contentType, size: result.data.byteLength };
 }
 
 // Best effort: a failed delete leaves an orphan blob, which is harmless.
@@ -48,7 +51,8 @@ export async function deleteFile(key: string | null | undefined): Promise<void> 
     return;
   }
   try {
-    await filesStore().delete(key);
+    if (process.env.FILES_DIR) await deleteLocalFile(key);
+    else await filesStore().delete(key);
   } catch {
     // Do not log the error or key: either may hold secrets or user data.
     console.error("Could not delete a stored file.");

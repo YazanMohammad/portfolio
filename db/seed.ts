@@ -21,7 +21,7 @@ type UploadFile = (bytes: Uint8Array, ext: string, contentType: string) => Promi
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 // Blobs need a site ID and token locally; inside Netlify the runtime supplies them.
-const blobsUnavailable = () => !(process.env.BLOBS_SITE_ID && process.env.BLOBS_TOKEN) && !process.env.NETLIFY;
+const blobsUnavailable = () => !process.env.FILES_DIR && !(process.env.BLOBS_SITE_ID && process.env.BLOBS_TOKEN) && !process.env.NETLIFY;
 const BLOBS_MESSAGE = "Blobs are not configured: set BLOBS_SITE_ID and BLOBS_TOKEN to upload files.";
 
 export const defaultUploadFile: UploadFile = async (bytes, ext, contentType) => {
