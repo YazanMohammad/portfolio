@@ -16,7 +16,7 @@ const fixtures = {
  projects: { slug: "old", title: "Title", summary: "Summary", body: "Body", role: null, category: "Web", technologies: ["TS"], liveUrl: null, githubUrl: null, imageKey, imageAlt: "Image", featured: false, isVisible: false, sortOrder: 7 },
  experience: { position: "Engineer", company: null, location: null, startDate: "2020-01", endDate: null, current: true, bullets: ["One"], isVisible: false, sortOrder: 7 },
  education: { degree: "Degree", school: "School", location: null, startDate: "2020-01", endDate: "2024-01", description: null, isVisible: false, sortOrder: 7 },
- skills: { name: "TS", category: "Language", iconSlug: null, isVisible: false, sortOrder: 7 },
+ skills: { name: "TS", category: "Language", iconSlug: null, iconSvg: null, isVisible: false, sortOrder: 7 },
 } as const;
 const cases = [
  { name: "projects", table: projects, input: fixtures.projects, row: projectToRow({ ...fixtures.projects, technologies: ["TS"] }) },
@@ -165,6 +165,19 @@ it("accepts a maximum-length multibyte project body (> 64 KiB) on POST", async (
  expect(response.status).toBe(201);
  expect(await response.json()).toEqual({ ...full, sortOrder: 0, id: 3 });
  expect(m.values).toHaveBeenCalledExactlyOnceWith({ ...projectToRow(full), sortOrder: 0 });
+});
+it("skill icons round-trip through POST, PUT and GET", async () => {
+ const iconSvg='<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>';
+ const input={...fixtures.skills,iconSvg};
+ const row={...skillToRow(input),id:9};
+ m.returning.mockResolvedValueOnce([row]);
+ const created=await handler(req('POST','/api/admin/skills',input),ctx);
+ expect(created.status).toBe(201); expect((await created.json()).iconSvg).toBe(iconSvg);
+ m.where.mockResolvedValueOnce([row]);
+ const updated=await handler(req('PUT','/api/admin/skills/9',input),ctx);
+ expect((await updated.json()).iconSvg).toBe(iconSvg);
+ m.order.mockResolvedValueOnce([row]);
+ expect((await (await handler(req('GET','/api/admin/skills'),ctx)).json())[0].iconSvg).toBe(iconSvg);
 });
 it("POST above the cap returns 413", async () => {
  const response = await handler(req("POST", "/api/admin/projects", { ...fixtures.projects, body: "x".repeat(140000) }), ctx);

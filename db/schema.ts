@@ -74,6 +74,7 @@ export const skills = pgTable("skills", {
   name: text("name").notNull(),
   category: text("category").notNull(),
   iconSlug: text("icon_slug"),
+  iconSvg: text("icon_svg"),
   isVisible: boolean("is_visible").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
 });

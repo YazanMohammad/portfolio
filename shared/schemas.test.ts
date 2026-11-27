@@ -31,7 +31,7 @@ describe("shared contract exports", () => {
       startDate: string | null; endDate: string | null; current: boolean; bullets: string[]; isVisible: boolean; sortOrder: number };
     type EducationShape = { id: number; degree: string; school: string; location: string | null; startDate: string | null;
       endDate: string | null; description: string | null; isVisible: boolean; sortOrder: number };
-    type SkillShape = { id: number; name: string; category: string; iconSlug: string | null; isVisible: boolean; sortOrder: number };
+    type SkillShape = { id: number; name: string; category: string; iconSlug: string | null; iconSvg?: string | null; isVisible: boolean; sortOrder: number };
     type MessageShape = { id: number; name: string; email: string; subject: string | null; message: string;
       isRead: boolean; archivedAt: string | null; createdAt: string };
     type ErrorCodeShape = "validation" | "unauthorized" | "forbidden_origin" | "not_found" | "conflict" |

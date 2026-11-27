@@ -13,7 +13,7 @@ const inputs = {
   projects: { slug: "created", title: "Created", summary: "Summary", body: "", role: null, category: "Web", technologies: ["TS"], liveUrl: null, githubUrl: null, imageKey: null, imageAlt: null, featured: false, isVisible: true, sortOrder: 0 },
   experience: { position: "Created", company: null, location: null, startDate: "2020-01", endDate: null, current: true, bullets: ["One"], isVisible: true, sortOrder: 0 },
   education: { degree: "Created", school: "School", location: null, startDate: "2020-01", endDate: "2024-01", description: null, isVisible: true, sortOrder: 0 },
-  skills: { name: "Created", category: "Language", iconSlug: null, isVisible: true, sortOrder: 0 },
+  skills: { name: "Created", category: "Language", iconSlug: null, iconSvg: null, isVisible: true, sortOrder: 0 },
 } as const;
 type Name = keyof typeof inputs;
 describeDb("OWED-DB admin collections (real DB)", () => {

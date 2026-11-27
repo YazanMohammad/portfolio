@@ -14,7 +14,7 @@ const experience: typeof db.experience.$inferSelect = { id: 1, position: "Engine
   endDate: "2025-01-01", current: false, bullets: ["Built it"], isVisible: true, sortOrder: 0 };
 const education: typeof db.education.$inferSelect = { id: 1, degree: "CS", school: "University", location: null, startDate: "2021-01-01",
   endDate: "2024-01-01", description: null, isVisible: true, sortOrder: 0 };
-const skill: typeof db.skills.$inferSelect = { id: 1, name: "TS", category: "Language", iconSlug: null, isVisible: true, sortOrder: 0 };
+const skill: typeof db.skills.$inferSelect = { id: 1, name: "TS", category: "Language", iconSlug: null, iconSvg: null, isVisible: true, sortOrder: 0 };
 const rows = () => ({ profile, projects: [project], experience: [experience], education: [education], skills: [skill] });
 afterEach(() => vi.useRealTimers());
 it('ymToDate and dateToYm round-trip "2024-09"', () => {

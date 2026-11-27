@@ -1,4 +1,5 @@
 import type * as db from "../db/schema";
+import { sanitizeSvg } from "../shared/svg";
 import type { Education, EducationInput, Experience, ExperienceInput, Message, Profile, ProfileInput,
   Project, ProjectInput, PublicContent, PublicProject, Skill, SkillInput, YearMonth } from "../shared/index";
 
@@ -44,7 +45,7 @@ export function toEducation(row: EducationRow): Education {
 }
 
 export function toSkill(row: SkillRow): Skill {
-  return { id: row.id, name: row.name, category: row.category, iconSlug: row.iconSlug,
+  return { id: row.id, name: row.name, category: row.category, iconSlug: row.iconSlug, iconSvg: row.iconSvg ?? null,
     isVisible: row.isVisible, sortOrder: row.sortOrder };
 }
 
@@ -74,6 +75,7 @@ export function educationToRow(input: EducationInput): Omit<EducationRow, "id"> 
 
 export function skillToRow(input: SkillInput): Omit<SkillRow, "id"> {
   return { name: input.name, category: input.category, iconSlug: input.iconSlug,
+    iconSvg: input.iconSvg ? sanitizeSvg(input.iconSvg) : null,
     isVisible: input.isVisible, sortOrder: input.sortOrder };
 }
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sanitizeSvg } from "./svg";
 import { fileKey, nullable, slug, url, yearMonth } from "./primitives";
 
 const text = (max: number) => z.string().trim().min(1).max(max);
@@ -81,6 +82,13 @@ export const SkillInput = z.object({
   name: text(50),
   category: text(50),
   iconSlug: optionalText(50),
+  iconSvg: z.string().nullable().optional().transform((value, ctx) => {
+    if (!value) return value;
+    try { return sanitizeSvg(value); } catch (error) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: (error as Error).message });
+      return z.NEVER;
+    }
+  }),
   isVisible: z.boolean(),
   sortOrder: z.number().int().min(0),
 });

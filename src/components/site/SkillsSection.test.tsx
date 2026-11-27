@@ -21,10 +21,18 @@ describe("SkillsSection", () => {
     expect(screen.getAllByRole("list")).toHaveLength(2);
     expect(screen.getAllByRole("listitem").map(item => item.textContent)).toEqual(["A", "C", "B"]);
   });
-  it("keeps every skill as plain text even when an icon is supplied", () => {
-    const {container}=render(<SkillsSection skills={[sk("TypeScript","Languages","typescript"),sk("LLMs","Tools",null)]}/>);
-    expect(screen.getByText("TypeScript", { selector: "li" })).toBeInTheDocument(); expect(screen.getByText("LLMs", { selector: "li" })).toBeInTheDocument();
-    expect(container.querySelector("img,svg")).toBeNull();
+  it("renders database icons as decorative images and no placeholder gap", () => {
+    const iconSvg = '<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>';
+    const {container}=render(<SkillsSection skills={[{...sk("TypeScript","Languages","typescript"),iconSvg},sk("LLMs","Tools",null)]}/>);
+    const image=container.querySelector('li img')!;
+    expect(image).toHaveAttribute('src', `data:image/svg+xml;charset=utf-8,${encodeURIComponent(iconSvg)}`);
+    expect(image).toHaveAttribute('alt','');
+    expect(screen.getByText('LLMs',{selector:'li'}).children).toHaveLength(0);
+    expect(container.querySelector('li svg')).toBeNull();
+  });
+  it("retains known iconSlug files as a legacy fallback",()=>{
+    const {container}=render(<SkillsSection skills={[sk('Python','Languages','python')]} />);
+    expect(container.querySelector('li img')).toHaveAttribute('src','/icons/python.svg');
   });
   it("has no levels, bars or percentages", () => {
     const { container } = render(<SkillsSection skills={[sk("TypeScript", "L", "typescript")]} />);
