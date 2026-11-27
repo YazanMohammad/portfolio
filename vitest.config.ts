@@ -17,6 +17,7 @@ export default defineConfig({
           environment: "node",
           include: [
             "server/**/*.test.ts",
+            "vps/**/*.test.ts",
             "db/**/*.test.ts",
             "shared/**/*.test.ts",
             "netlify/**/*.test.ts",

@@ -19,5 +19,5 @@
       "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["src", "shared", "server", "db", "netlify", "tests", "vite-plugins"]
+  "include": ["vps", "src", "shared", "server", "db", "netlify", "tests", "vite-plugins"]
 }
