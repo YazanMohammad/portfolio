@@ -96,10 +96,10 @@ export async function markLoginSuccess(ipHash: string, attemptId: number, now: D
 // Reuse the existing event table and advisory-lock pattern, with a namespaced bucket and
 // success=true so icon requests never consume password failures or interfere with login cleanup.
 // Denied searches insert nothing: repeated refusals cannot grow this bucket.
-export async function reserveSvglSearch(ipHash: string, now: Date = new Date()): Promise<
+export async function reserveIconSearch(ipHash: string, now: Date = new Date()): Promise<
   { allowed: true } | { allowed: false; retryAfter: number }
 > {
-  const bucket = `svgl:${ipHash}`;
+  const bucket = `icons:${ipHash}`;
   const [, , inserted, recent] = await db.batch([
     db.execute(lockHash(bucket, 2)),
     pruneOwnLoginAttempts(bucket, now),

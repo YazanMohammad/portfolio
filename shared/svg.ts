@@ -71,4 +71,15 @@ export function sanitizeSvg(source: string): string {
  checkSize(output);
  return output;
 }
+/** Monochrome registry variants inherit a light ink on the site's black background. */
+export function lightenMonochromeSvg(source: string): string {
+ let cleaned=sanitizeSvg(source).replace(/\b(fill|stroke|stop-color|color)="([^"]*)"/g,(_match,key:string,value:string)=>
+  `${key}="${value==='none'||value==='transparent'||value.startsWith('url(')?value:'#f4f4f4'}"`);
+ cleaned=cleaned.replace(/^<svg\b([^>]*?)(\/?)>/,(_match,attrs:string,slash:string)=>{
+  const fill=/\bfill=/.test(attrs)?'':' fill="#f4f4f4"';
+  const color=/\bcolor=/.test(attrs)?'':' color="#f4f4f4"';
+  return `<svg${attrs}${fill}${color}${slash}>`;
+ });
+ return sanitizeSvg(cleaned);
+}
 export const svgDataUri = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;

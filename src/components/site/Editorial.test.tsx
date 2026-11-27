@@ -29,7 +29,7 @@ describe("editorial public site", () => {
   it("typesets skills without icon tiles", () => {
     const {container}=render(<SkillsSection skills={content.skills} />);
     content.skills.forEach(s=>expect(screen.getByText(s.name, { selector: "li" })).toBeInTheDocument());
-    expect(container.querySelectorAll("li img")).toHaveLength(18);
+    expect(container.querySelectorAll("li img")).toHaveLength(22);
     expect(container.querySelector("li svg")).toBeNull();
   });
   it("shows CV employers, dates and bullets, without education metrics", () => {

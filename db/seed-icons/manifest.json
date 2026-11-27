@@ -1,0 +1,178 @@
+{
+  "Python": {
+    "slug": "python",
+    "title": "Python",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "python.svg",
+    "source": "https://thesvg.org/icons/python/mono.svg"
+  },
+  "C#": {
+    "slug": "csharp",
+    "title": "C#",
+    "variant": "default",
+    "license": "MIT",
+    "file": "csharp.svg",
+    "source": "https://thesvg.org/icons/csharp/default.svg"
+  },
+  "JavaScript": {
+    "slug": "javascript",
+    "title": "JavaScript",
+    "variant": "mono",
+    "license": "MIT",
+    "file": "javascript.svg",
+    "source": "https://thesvg.org/icons/javascript/mono.svg"
+  },
+  "TypeScript": {
+    "slug": "typescript",
+    "title": "TypeScript",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "typescript.svg",
+    "source": "https://thesvg.org/icons/typescript/mono.svg"
+  },
+  "Java": {
+    "slug": "java",
+    "title": "Java",
+    "variant": "default",
+    "license": "MIT",
+    "file": "java.svg",
+    "source": "https://thesvg.org/icons/java/default.svg"
+  },
+  "Codex": {
+    "slug": "codex",
+    "title": "Codex",
+    "variant": "dark",
+    "license": "brand-use",
+    "file": "codex.svg",
+    "source": "https://thesvg.org/icons/codex/dark.svg"
+  },
+  "Claude coding agents": {
+    "slug": "claude-code",
+    "title": "Claude Code",
+    "variant": "mono",
+    "license": "MIT",
+    "file": "claude-code.svg",
+    "source": "https://thesvg.org/icons/claude-code/mono.svg"
+  },
+  "MCP tool use for coding": {
+    "slug": "model-context-protocol",
+    "title": "Model Context Protocol",
+    "variant": "dark",
+    "license": "CC0-1.0",
+    "file": "mcp.svg",
+    "source": "https://thesvg.org/icons/model-context-protocol/dark.svg"
+  },
+  "n8n": {
+    "slug": "n8n",
+    "title": "n8n",
+    "variant": "dark",
+    "license": "CC0-1.0",
+    "file": "n8n.svg",
+    "source": "https://thesvg.org/icons/n8n/dark.svg"
+  },
+  "ASP.NET Core": {
+    "slug": "dotnetcore",
+    "title": "Dotnetcore",
+    "variant": "mono",
+    "license": "MIT",
+    "file": "dotnet.svg",
+    "source": "https://thesvg.org/icons/dotnetcore/mono.svg"
+  },
+  "SQL Server": {
+    "slug": "microsoft-sql-server",
+    "title": "Microsoft SQL Server",
+    "variant": "default",
+    "license": "MIT",
+    "file": "sql-server.svg",
+    "source": "https://thesvg.org/icons/microsoft-sql-server/default.svg"
+  },
+  "Swagger": {
+    "slug": "swagger",
+    "title": "Swagger",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "swagger.svg",
+    "source": "https://thesvg.org/icons/swagger/mono.svg"
+  },
+  "React.js": {
+    "slug": "react",
+    "title": "React",
+    "variant": "dark",
+    "license": "CC0-1.0",
+    "file": "react.svg",
+    "source": "https://thesvg.org/icons/react/dark.svg"
+  },
+  "HTML": {
+    "slug": "html5",
+    "title": "HTML5",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "html.svg",
+    "source": "https://thesvg.org/icons/html5/mono.svg"
+  },
+  "CSS": {
+    "slug": "css",
+    "title": "CSS",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "css.svg",
+    "source": "https://thesvg.org/icons/css/mono.svg"
+  },
+  "Git": {
+    "slug": "git",
+    "title": "Git",
+    "variant": "mono",
+    "license": "CC-BY-3.0",
+    "file": "git.svg",
+    "source": "https://thesvg.org/icons/git/mono.svg"
+  },
+  "Docker": {
+    "slug": "docker",
+    "title": "Docker",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "docker.svg",
+    "source": "https://thesvg.org/icons/docker/mono.svg"
+  },
+  "Linux": {
+    "slug": "linux",
+    "title": "Linux",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "linux.svg",
+    "source": "https://thesvg.org/icons/linux/mono.svg"
+  },
+  "JWT authentication": {
+    "slug": "jwt",
+    "title": "JWT",
+    "variant": "default",
+    "license": "MIT",
+    "file": "jwt.svg",
+    "source": "https://thesvg.org/icons/jwt/default.svg"
+  },
+  "REST/JSON APIs": {
+    "slug": "json",
+    "title": "JSON",
+    "variant": "mono",
+    "license": "CC0-1.0",
+    "file": "json.svg",
+    "source": "https://thesvg.org/icons/json/mono.svg"
+  },
+  "SignalR": {
+    "slug": "azure-signalr",
+    "title": "SignalR",
+    "variant": "default",
+    "license": "MIT",
+    "file": "signalr.svg",
+    "source": "https://thesvg.org/icons/azure-signalr/default.svg"
+  },
+  "Entity Framework Core": {
+    "slug": "entityframeworkcore",
+    "title": "Entityframeworkcore",
+    "variant": "mono",
+    "license": "MIT",
+    "file": "entity-framework-core.svg",
+    "source": "https://thesvg.org/icons/entityframeworkcore/mono.svg"
+  }
+}

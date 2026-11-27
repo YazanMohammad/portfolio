@@ -117,6 +117,9 @@
  .site-shell .footer .section-art { width: 68px; top: 0; right: 0; left: auto; }
  .site-shell .contact-lead { max-width: 30ch; }
 }
+@media (max-width: 480px) {
+ .site-shell .skills-list .skills__group ul { font-size: 16px; }
+}
 @media (prefers-reduced-motion: reduce) {
  .site-shell .name-letter { opacity: 1; transform: none; }
  .site-shell .skills-marquee__track { width: 100%; display: block; transform: none; }

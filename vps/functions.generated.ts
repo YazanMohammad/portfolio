@@ -2,11 +2,11 @@
 import * as f0 from "../netlify/functions/admin-account";
 import * as f1 from "../netlify/functions/admin-collection";
 import * as f2 from "../netlify/functions/admin-files";
-import * as f3 from "../netlify/functions/admin-messages";
-import * as f4 from "../netlify/functions/admin-profile";
-import * as f5 from "../netlify/functions/admin-settings";
-import * as f6 from "../netlify/functions/admin-summary";
-import * as f7 from "../netlify/functions/admin-svgl";
+import * as f3 from "../netlify/functions/admin-icons";
+import * as f4 from "../netlify/functions/admin-messages";
+import * as f5 from "../netlify/functions/admin-profile";
+import * as f6 from "../netlify/functions/admin-settings";
+import * as f7 from "../netlify/functions/admin-summary";
 import * as f8 from "../netlify/functions/api-not-found";
 import * as f9 from "../netlify/functions/auth-login";
 import * as f10 from "../netlify/functions/auth-logout";
@@ -21,11 +21,11 @@ export const functions = [
   { name: "admin-account", handler: f0.default, config: f0.config },
   { name: "admin-collection", handler: f1.default, config: f1.config },
   { name: "admin-files", handler: f2.default, config: f2.config },
-  { name: "admin-messages", handler: f3.default, config: f3.config },
-  { name: "admin-profile", handler: f4.default, config: f4.config },
-  { name: "admin-settings", handler: f5.default, config: f5.config },
-  { name: "admin-summary", handler: f6.default, config: f6.config },
-  { name: "admin-svgl", handler: f7.default, config: f7.config },
+  { name: "admin-icons", handler: f3.default, config: f3.config },
+  { name: "admin-messages", handler: f4.default, config: f4.config },
+  { name: "admin-profile", handler: f5.default, config: f5.config },
+  { name: "admin-settings", handler: f6.default, config: f6.config },
+  { name: "admin-summary", handler: f7.default, config: f7.config },
   { name: "api-not-found", handler: f8.default, config: undefined },
   { name: "auth-login", handler: f9.default, config: f9.config },
   { name: "auth-logout", handler: f10.default, config: f10.config },

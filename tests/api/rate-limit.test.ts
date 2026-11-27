@@ -5,7 +5,7 @@ import { db } from "../../db/client";
 import { loginAttempts, messages } from "../../db/schema";
 import type { MessageInput } from "../../shared";
 import { hashIp } from "../../server/ip";
-import { reserveSvglSearch, insertMessageIfAllowed, markLoginSuccess, messageRetryAfter, reserveLoginAttempt } from "../../server/rate-limit";
+import { reserveIconSearch, insertMessageIfAllowed, markLoginSuccess, messageRetryAfter, reserveLoginAttempt } from "../../server/rate-limit";
 import { describeDb } from "./describe-db";
 
 // Runs only against the Neon test branch. Task 10 fills tests/api/setup.ts.
@@ -48,16 +48,16 @@ describeDb("rate limits (real db)", () => {
     else process.env.DATABASE_URL = savedUrl;
   });
 
-  it('svgl search reservations persist across a parallel burst, expire and do not consume login attempts',async()=>{
-    const hash=freshHash(), other=freshHash(), now=new Date(); used.push('svgl:'+hash,'svgl:'+other);
-    const burst=await Promise.all(Array.from({length:14},()=>reserveSvglSearch(hash,now)));
+  it('icons search reservations persist across a parallel burst, expire and do not consume login attempts',async()=>{
+    const hash=freshHash(), other=freshHash(), now=new Date(); used.push('icons:'+hash,'icons:'+other);
+    const burst=await Promise.all(Array.from({length:14},()=>reserveIconSearch(hash,now)));
     expect(burst.filter(r=>r.allowed)).toHaveLength(12);
     expect(burst.filter(r=>!r.allowed)).toEqual([{allowed:false,retryAfter:60},{allowed:false,retryAfter:60}]);
-    expect(await reserveSvglSearch(other,now)).toEqual({allowed:true});
+    expect(await reserveIconSearch(other,now)).toEqual({allowed:true});
     const login=await reserveLoginAttempt(hash,now);expect(login.allowed).toBe(true);
     if(login.allowed)await markLoginSuccess(hash,login.attemptId,now);
-    expect(await reserveSvglSearch(hash,now)).toEqual({allowed:false,retryAfter:60});
-    expect(await reserveSvglSearch(hash,new Date(now.getTime()+60000))).toEqual({allowed:true});
+    expect(await reserveIconSearch(hash,now)).toEqual({allowed:false,retryAfter:60});
+    expect(await reserveIconSearch(hash,new Date(now.getTime()+60000))).toEqual({allowed:true});
   });
   it("5 attempts allowed, 6th refused with retryAfter 1..900", async () => {
     const hash = freshHash();

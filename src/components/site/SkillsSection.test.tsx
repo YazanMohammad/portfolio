@@ -52,6 +52,11 @@ describe("SkillsSection", () => {
     expect(css).toContain('.site-shell .skill-icon { width: max(16px, 1em); height: max(16px, 1em);');
     expect(css).toContain('vertical-align: -.12em');
   });
+  it('keeps phone grouped text and icons readable without squeezing long authentication labels',()=>{
+    const css=readFileSync('src/components/site/poster.css','utf8');
+    expect(css).toContain('@media (max-width: 480px)');
+    expect(css).toContain('.site-shell .skills-list .skills__group ul { font-size: 16px; }');
+  });
   it("has no levels, bars or percentages", () => {
     const { container } = render(<SkillsSection skills={[sk("TypeScript", "L", "typescript")]} />);
     expect(container.querySelector('[role="progressbar"]')).toBeNull();

@@ -275,7 +275,7 @@ export const seedSkills: SkillInput[] = [
     "name": "REST/JSON APIs",
     "category": "Backend & APIs",
     "iconSlug": null,
-    "iconSvg": null,
+    "iconSvg": seedIcon("json"),
     "isVisible": true,
     "sortOrder": 16
   },
@@ -299,7 +299,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Entity Framework Core",
     "category": "Backend & APIs",
     "iconSlug": null,
-    "iconSvg": null,
+    "iconSvg": seedIcon("entity-framework-core"),
     "isVisible": true,
     "sortOrder": 19
   },
@@ -315,7 +315,7 @@ export const seedSkills: SkillInput[] = [
     "name": "JWT authentication",
     "category": "Backend & APIs",
     "iconSlug": null,
-    "iconSvg": null,
+    "iconSvg": seedIcon("jwt"),
     "isVisible": true,
     "sortOrder": 21
   },
@@ -339,7 +339,7 @@ export const seedSkills: SkillInput[] = [
     "name": "SignalR",
     "category": "Backend & APIs",
     "iconSlug": null,
-    "iconSvg": null,
+    "iconSvg": seedIcon("signalr"),
     "isVisible": true,
     "sortOrder": 24
   },

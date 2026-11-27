@@ -1,28 +1,38 @@
-# Skill icons
+# Skill icons from theSVG
 
-Downloaded from svgl.app on November 27, 2026, then passed through `shared/svg.ts`. Icons are trademarks of their owners and identify tools used. Seed reads only these local files; fallback embeds exactly the same SVG. `iconSvg` takes precedence; known `iconSlug` files remain supported for legacy records. Removing an icon in admin clears both fields.
+Registry: https://thesvg.org/api/registry.json. All selected sources, variants and per-icon licenses are recorded below and in `manifest.json`. These are real tool logos, not substitutes for generic concepts. Product names and logos remain trademarks of their owners.
 
-Dark routes are preferred; icon routes (not wordmarks) are used. No generic database logo is substituted for SQL. The svgl API offers no dark Linux variant, so Linux uses the Simple Icons monochrome Tux silhouette recoloured `#f4f4f4` for the black background (Tux originally by Larry Ewing). Other icons remain from svgl. Every SVG is canonicalised with a standalone root namespace.
+Selection order: dark, then mono, then default. Mono variants are recoloured `#f4f4f4` for the black background; other variants retain their colours. Every file passes the same 16 KB XML allow-list used by the server. Seed reads committed local files only; fallback embeds exactly the same SVGs. No icon-service network is needed to seed.
 
-| Skill | Source |
-|---|---|
-| Python | https://svgl.app/library/python.svg |
-| C# | https://svgl.app/library/csharp.svg |
-| JavaScript | https://svgl.app/library/javascript.svg |
-| TypeScript | https://svgl.app/library/typescript.svg |
-| Java | https://svgl.app/library/java.svg |
-| Codex | https://svgl.app/library/codex_dark.svg |
-| Claude coding agents | https://svgl.app/library/claude-code.svg |
-| MCP tool use for coding | https://svgl.app/library/model-context-protocol-dark.svg |
-| n8n | https://svgl.app/library/n8n.svg |
-| ASP.NET Core | https://svgl.app/library/dotnet.svg |
-| SQL Server | https://svgl.app/library/sql-server.svg |
-| Swagger | https://svgl.app/library/swagger.svg |
-| React.js | https://svgl.app/library/react_dark.svg |
-| HTML | https://svgl.app/library/html5.svg |
-| CSS | https://svgl.app/library/css.svg |
-| Git | https://svgl.app/library/git.svg |
-| Docker | https://svgl.app/library/docker-new-dark.svg |
-| Linux | https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/linux.svg |
+`iconSvg` takes precedence; known `iconSlug` files remain a legacy fallback. Removing an icon clears both fields.
 
-No logo: SQL, LLM-response evaluation, coding and reasoning assessment, instruction-following evaluation, Arabic-language quality review, prompt design, REST/JSON APIs, API integration, Entity Framework Core, JWT authentication, input validation, SignalR. Entity Framework Core and SignalR have no svgl match, including searches for entity/framework and signal.
+| CV skill | Registry slug | Variant | Manifest license | Source |
+|---|---|---|---|---|
+| Python | python | mono | CC0-1.0 | https://thesvg.org/icons/python/mono.svg |
+| C# | csharp | default | MIT | https://thesvg.org/icons/csharp/default.svg |
+| JavaScript | javascript | mono | MIT | https://thesvg.org/icons/javascript/mono.svg |
+| TypeScript | typescript | mono | CC0-1.0 | https://thesvg.org/icons/typescript/mono.svg |
+| Java | java | default | MIT | https://thesvg.org/icons/java/default.svg |
+| Codex | codex | dark | brand-use | https://thesvg.org/icons/codex/dark.svg |
+| Claude coding agents | claude-code | mono | MIT | https://thesvg.org/icons/claude-code/mono.svg |
+| MCP tool use for coding | model-context-protocol | dark | CC0-1.0 | https://thesvg.org/icons/model-context-protocol/dark.svg |
+| n8n | n8n | dark | CC0-1.0 | https://thesvg.org/icons/n8n/dark.svg |
+| ASP.NET Core | dotnetcore | mono | MIT | https://thesvg.org/icons/dotnetcore/mono.svg |
+| SQL Server | microsoft-sql-server | default | MIT | https://thesvg.org/icons/microsoft-sql-server/default.svg |
+| Swagger | swagger | mono | CC0-1.0 | https://thesvg.org/icons/swagger/mono.svg |
+| React.js | react | dark | CC0-1.0 | https://thesvg.org/icons/react/dark.svg |
+| HTML | html5 | mono | CC0-1.0 | https://thesvg.org/icons/html5/mono.svg |
+| CSS | css | mono | CC0-1.0 | https://thesvg.org/icons/css/mono.svg |
+| Git | git | mono | CC-BY-3.0 | https://thesvg.org/icons/git/mono.svg |
+| Docker | docker | mono | CC0-1.0 | https://thesvg.org/icons/docker/mono.svg |
+| Linux | linux | mono | CC0-1.0 | https://thesvg.org/icons/linux/mono.svg |
+| JWT authentication | jwt | default | MIT | https://thesvg.org/icons/jwt/default.svg |
+| REST/JSON APIs | json | mono | CC0-1.0 | https://thesvg.org/icons/json/mono.svg |
+| SignalR | azure-signalr | default | MIT | https://thesvg.org/icons/azure-signalr/default.svg |
+| Entity Framework Core | entityframeworkcore | mono | MIT | https://thesvg.org/icons/entityframeworkcore/mono.svg |
+
+Git logo by Jason Long, CC-BY-3.0 (https://creativecommons.org/licenses/by/3.0/); mono recolouring and XML sanitisation are modifications. MIT/brand-use/CC0 labels above are the licenses reported by the registry, not a grant to imply endorsement.
+
+No icon: SQL, LLM-response evaluation, coding and reasoning assessment, instruction-following evaluation, Arabic-language quality review, prompt design, API integration, input validation.
+
+Entity Framework Core was found under `entityframeworkcore` (aliases include “Ef core” and “Entity framework core”). JWT, JSON and Azure SignalR identify the named technologies; no unrelated database/vendor logo is used for SQL, API integration or evaluation/prompt/input-validation concepts.

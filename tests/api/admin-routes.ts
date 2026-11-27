@@ -1,5 +1,5 @@
 import type { Context } from "@netlify/functions";
-import adminSvgl from "../../netlify/functions/admin-svgl";
+import adminIcons from "../../netlify/functions/admin-icons";
 import adminAccount from "../../netlify/functions/admin-account";
 import adminCollection from "../../netlify/functions/admin-collection";
 import adminFiles from "../../netlify/functions/admin-files";
@@ -14,7 +14,7 @@ import authMe from "../../netlify/functions/auth-me";
 // fails otherwise).
 type Handler = (req: Request, ctx: Context) => Promise<Response>;
 export const HANDLERS = {
-  "admin-svgl.ts": adminSvgl,
+  "admin-icons.ts": adminIcons,
   "admin-account.ts": adminAccount,
   "admin-collection.ts": adminCollection,
   "admin-files.ts": adminFiles,
@@ -29,7 +29,7 @@ export type AdminRoute = { method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; 
 
 const COLLECTIONS = ["projects", "experience", "education", "skills"] as const;
 export const ADMIN_ROUTES: AdminRoute[] = [
-  { method: "GET", path: "/api/admin/svgl?search=react", file: "admin-svgl.ts" },
+  { method: "GET", path: "/api/admin/icons?search=react", file: "admin-icons.ts" },
   { method: "GET", path: "/api/auth/me", file: "auth-me.ts" },
   { method: "GET", path: "/api/admin/summary", file: "admin-summary.ts" },
   { method: "GET", path: "/api/admin/profile", file: "admin-profile.ts" },

@@ -155,7 +155,7 @@ describe("skills form", () => {
     const dl = document.getElementById(listId!)!;
     expect(dl.tagName).toBe("DATALIST");
     expect([...dl.querySelectorAll("option")].map((o) => o.getAttribute("value"))).toEqual(["Languages", "Tools"]);
-    expect(within(document.body).getByLabelText("Find on svgl")).toBeInTheDocument();
+    expect(within(document.body).getByLabelText("Find on theSVG")).toBeInTheDocument();
   });
   it("row subtitle shows the category", () => {
     expect(skillsConfig.rowSubtitle(skill())).toBe("Languages");
