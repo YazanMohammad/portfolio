@@ -82,7 +82,7 @@ describe("completeness", () => {
   });
 
   it("covers the contract §4 admin route count", () => {
-    expect(ADMIN_ROUTES).toHaveLength(32);
+    expect(ADMIN_ROUTES).toHaveLength(33);
     expect(new Set(ADMIN_ROUTES.map(label)).size).toBe(ADMIN_ROUTES.length);
   });
 });

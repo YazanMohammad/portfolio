@@ -1,4 +1,5 @@
 import { SkillInput, type Skill } from "@shared/index";
+import { SkillIconField } from "./SkillIconField";
 import { Input } from "@/components/ui/input";
 import { useAdminList } from "@/lib/admin/queries";
 import { FieldShell, TextField, type AnyForm } from "../form/FormField";
@@ -42,7 +43,7 @@ function SkillFormBody({ form }: { form: AnyForm; item: Skill | null }) {
     <>
       <TextField form={form} name="name" label="Name" required maxLength={50} />
       <CategoryField form={form} />
-      <TextField form={form} name="iconSlug" label="Icon name" hint="Name of a tool icon, for example python" maxLength={50} />
+      <SkillIconField form={form} />
     </>
   );
 }
@@ -52,9 +53,9 @@ export const skillsConfig: CollectionConfig<Skill, SkillInput> = {
   title: "Skills",
   singular: "skill",
   schema: SkillInput,
-  knownFields: ["name", "category", "iconSlug", "isVisible", "sortOrder"],
+  knownFields: ["name", "category", "iconSlug", "iconSvg", "isVisible", "sortOrder"],
   toInput: ({ id: _id, ...rest }) => rest,
-  emptyInput: (sortOrder) => ({ name: "", category: "", iconSlug: null, isVisible: false, sortOrder }),
+  emptyInput: (sortOrder) => ({ name: "", category: "", iconSlug: null, iconSvg: null, isVisible: false, sortOrder }),
   duplicateInput: (item, _all, sortOrder) => {
     const { id: _id, ...rest } = item;
     return { ...rest, name: copyName(item.name, SKILL_NAME_MAX), isVisible: false, sortOrder };

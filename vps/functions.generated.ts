@@ -6,15 +6,16 @@ import * as f3 from "../netlify/functions/admin-messages";
 import * as f4 from "../netlify/functions/admin-profile";
 import * as f5 from "../netlify/functions/admin-settings";
 import * as f6 from "../netlify/functions/admin-summary";
-import * as f7 from "../netlify/functions/api-not-found";
-import * as f8 from "../netlify/functions/auth-login";
-import * as f9 from "../netlify/functions/auth-logout";
-import * as f10 from "../netlify/functions/auth-me";
-import * as f11 from "../netlify/functions/content";
-import * as f12 from "../netlify/functions/cv";
-import * as f13 from "../netlify/functions/files";
-import * as f14 from "../netlify/functions/messages";
-import * as f15 from "../netlify/functions/project";
+import * as f7 from "../netlify/functions/admin-svgl";
+import * as f8 from "../netlify/functions/api-not-found";
+import * as f9 from "../netlify/functions/auth-login";
+import * as f10 from "../netlify/functions/auth-logout";
+import * as f11 from "../netlify/functions/auth-me";
+import * as f12 from "../netlify/functions/content";
+import * as f13 from "../netlify/functions/cv";
+import * as f14 from "../netlify/functions/files";
+import * as f15 from "../netlify/functions/messages";
+import * as f16 from "../netlify/functions/project";
 
 export const functions = [
   { name: "admin-account", handler: f0.default, config: f0.config },
@@ -24,13 +25,14 @@ export const functions = [
   { name: "admin-profile", handler: f4.default, config: f4.config },
   { name: "admin-settings", handler: f5.default, config: f5.config },
   { name: "admin-summary", handler: f6.default, config: f6.config },
-  { name: "api-not-found", handler: f7.default, config: undefined },
-  { name: "auth-login", handler: f8.default, config: f8.config },
-  { name: "auth-logout", handler: f9.default, config: f9.config },
-  { name: "auth-me", handler: f10.default, config: f10.config },
-  { name: "content", handler: f11.default, config: f11.config },
-  { name: "cv", handler: f12.default, config: f12.config },
-  { name: "files", handler: f13.default, config: f13.config },
-  { name: "messages", handler: f14.default, config: f14.config },
-  { name: "project", handler: f15.default, config: f15.config },
+  { name: "admin-svgl", handler: f7.default, config: f7.config },
+  { name: "api-not-found", handler: f8.default, config: undefined },
+  { name: "auth-login", handler: f9.default, config: f9.config },
+  { name: "auth-logout", handler: f10.default, config: f10.config },
+  { name: "auth-me", handler: f11.default, config: f11.config },
+  { name: "content", handler: f12.default, config: f12.config },
+  { name: "cv", handler: f13.default, config: f13.config },
+  { name: "files", handler: f14.default, config: f14.config },
+  { name: "messages", handler: f15.default, config: f15.config },
+  { name: "project", handler: f16.default, config: f16.config },
 ];
