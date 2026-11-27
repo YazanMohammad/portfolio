@@ -1,0 +1,27 @@
+[Unit]
+Description=Portfolio standalone server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hosting
+Group=hosting
+WorkingDirectory=/home/hosting/portfolio
+EnvironmentFile=/home/hosting/portfolio/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node dist-server/server.mjs
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=40
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+# ProtectHome=read-only keeps the checkout and .env readable; only data is writable.
+ReadWritePaths=/home/hosting/data
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

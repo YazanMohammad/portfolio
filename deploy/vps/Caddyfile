@@ -1,0 +1,14 @@
+# Set SITE_HOST in Caddy's environment, e.g. 185-189-1-11.sslip.io or www.yznmoh.com.
+{$SITE_HOST} {
+    encode zstd gzip
+    # 4 MiB upload + 64 KiB multipart envelope; same as vps/server.ts.
+    request_body {
+        max_size 4259840
+    }
+    reverse_proxy 127.0.0.1:3000
+}
+
+# Enable this apex redirect only after both DNS records point to this VPS.
+yznmoh.com {
+    redir https://www.yznmoh.com{uri} 301
+}
