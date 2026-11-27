@@ -63,8 +63,8 @@
 .site-shell .editorial-grid > .skills-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; grid-column: 4 / 13; }
 .site-shell .skills-list .skills__group { display: block; grid-column: auto; padding: 20px 0 0; }
 .site-shell .skills__group h3 { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
-.site-shell .skills-list .skills__group ul { display: block; font-size: 14px; }
-.site-shell .skills__group li { line-height: 2; white-space: normal; }
+.site-shell .skills-list .skills__group ul { display: block; font-size: 18px; }
+.site-shell .skills__group li { line-height: 1.65; white-space: normal; align-items: baseline; }
 .site-shell .skills-marquee { overflow: hidden; margin: 8px 0 40px; border-block: 1px solid var(--line); padding-block: 18px; font: 400 clamp(26px,3.3vw,48px)/1.2 var(--font-mono); }
 .site-shell .skills-marquee__track { display: flex; width: max-content; animation: skills-run 80s linear infinite; }
 .site-shell .skills-marquee__copy { display: flex; flex-shrink: 0; }
@@ -122,6 +122,7 @@
  .site-shell .skills-marquee__track { width: 100%; display: block; transform: none; }
  .site-shell .skills-marquee__copy { display: flex; flex-wrap: wrap; justify-content: center; }
  .site-shell .skills-marquee__copy + .skills-marquee__copy { display: none; }
+ .site-shell .skills-marquee__copy > span { white-space: normal; max-width: 100%; }
 }
 
 .site-shell[data-name-reveal="false"] .hero h1 { animation: none; }

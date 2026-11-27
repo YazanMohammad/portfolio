@@ -65,7 +65,7 @@ describeDb("OWED-DB admin collections (real DB)", () => {
     });
   });
   it("persists a sanitised skill icon and exposes it in public content", async()=>{
-    const iconSvg='<svg viewBox="0 0 1 1"><path fill="#fff"/></svg>';
+    const iconSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path fill="#fff"/></svg>';
     const response=await run('/api/admin/skills','POST',{...inputs.skills,iconSvg:iconSvg.replace('<path','<path onload="bad()"')});
     expect(response.status).toBe(201); const created=await response.json(); expect(created.iconSvg).toBe(iconSvg);
     const read=await (await run('/api/admin/skills')).json();

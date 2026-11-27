@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { expect, it, vi, afterEach } from 'vitest';
 import { SkillIconField } from './SkillIconField';
 import type { AnyForm } from '../form/FormField';
-const iconSvg='<svg viewBox="0 0 1 1"/>';
+const iconSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>';
 afterEach(()=>vi.unstubAllGlobals());
 it('searches through same-origin proxy, picks and removes an icon',async()=>{
  const setValue=vi.fn();
@@ -17,6 +17,11 @@ it('searches through same-origin proxy, picks and removes an icon',async()=>{
  await user.click(screen.getByRole('button',{name:'Remove icon'}));
  expect(setValue).toHaveBeenCalledWith('iconSvg',null,{shouldDirty:true,shouldValidate:true});
  expect(setValue).toHaveBeenCalledWith('iconSlug',null,{shouldDirty:true});
+});
+it('warns that styles and classes are removed from uploads',()=>{
+ const form={watch:()=>null,setValue:vi.fn()} as unknown as AnyForm;
+ render(<SkillIconField form={form}/>);
+ expect(screen.getByText(/styles and classes are removed/i)).toBeInTheDocument();
 });
 it('reads an uploaded SVG into the field for sanitisation on save',async()=>{
  const setValue=vi.fn(); const form={watch:()=>null,setValue} as unknown as AnyForm;

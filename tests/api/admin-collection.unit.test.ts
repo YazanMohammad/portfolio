@@ -167,7 +167,7 @@ it("accepts a maximum-length multibyte project body (> 64 KiB) on POST", async (
  expect(m.values).toHaveBeenCalledExactlyOnceWith({ ...projectToRow(full), sortOrder: 0 });
 });
 it("skill icons round-trip through POST, PUT and GET", async () => {
- const iconSvg='<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>';
+ const iconSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path d="M0 0"/></svg>';
  const input={...fixtures.skills,iconSvg};
  const row={...skillToRow(input),id:9};
  m.returning.mockResolvedValueOnce([row]);
@@ -178,6 +178,18 @@ it("skill icons round-trip through POST, PUT and GET", async () => {
  expect((await updated.json()).iconSvg).toBe(iconSvg);
  m.order.mockResolvedValueOnce([row]);
  expect((await (await handler(req('GET','/api/admin/skills'),ctx)).json())[0].iconSvg).toBe(iconSvg);
+});
+it("saves quoted SVG titles through both POST and PUT without a 500", async()=>{
+ const raw='<svg><title>Say "hi" &amp; goodbye</title><path d="M0 0\nL1 1"/></svg>';
+ const expected='<svg xmlns="http://www.w3.org/2000/svg"><title>Say "hi" &amp; goodbye</title><path d="M0 0 L1 1"/></svg>';
+ const input={...fixtures.skills,iconSvg:raw};
+ m.returning.mockResolvedValueOnce([{...fixtures.skills,iconSvg:expected,id:9,sortOrder:0}]);
+ const created=await handler(req('POST','/api/admin/skills',input),ctx);
+ expect(created.status).toBe(201);expect((await created.json()).iconSvg).toBe(expected);
+ expect(m.values).toHaveBeenCalledWith(expect.objectContaining({iconSvg:expected}));
+ m.where.mockResolvedValueOnce([{...fixtures.skills,iconSvg:expected,id:9}]);
+ const updated=await handler(req('PUT','/api/admin/skills/9',input),ctx);
+ expect(updated.status).toBe(200);expect((await updated.json()).iconSvg).toBe(expected);
 });
 it("POST above the cap returns 413", async () => {
  const response = await handler(req("POST", "/api/admin/projects", { ...fixtures.projects, body: "x".repeat(140000) }), ctx);

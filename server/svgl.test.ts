@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { searchSvgl } from './svgl';
 afterEach(()=>vi.unstubAllGlobals());
-const icon='<svg viewBox="0 0 1 1" onload="bad()"><path fill="#fff"/></svg>';
+const icon='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" onload="bad()"><path fill="#fff"/></svg>';
 it('uses a fixed API host, dark variant, sanitised data previews and deadline', async()=>{
  const fetcher=vi.fn().mockResolvedValueOnce(new Response(JSON.stringify([{title:'React',route:{dark:'https://svgl.app/library/react_dark.svg',light:'https://svgl.app/library/react.svg'}}]))).mockResolvedValueOnce(new Response(icon));
  vi.stubGlobal('fetch',fetcher);
@@ -9,7 +9,7 @@ it('uses a fixed API host, dark variant, sanitised data previews and deadline', 
  expect(String(fetcher.mock.calls[0][0])).toBe('https://api.svgl.app/?search=https%3A%2F%2Fevil.test%2F%3Fx%3Dreact');
  expect(fetcher.mock.calls[0][1]).toMatchObject({redirect:'error',signal:expect.any(AbortSignal)});
  expect(String(fetcher.mock.calls[1][0])).toBe('https://svgl.app/library/react_dark.svg');
- expect(results).toEqual([{title:'React',iconSvg:'<svg viewBox="0 0 1 1"><path fill="#fff"/></svg>',preview:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg viewBox="0 0 1 1"><path fill="#fff"/></svg>')}]);
+ expect(results).toEqual([{title:'React',iconSvg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path fill="#fff"/></svg>',preview:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path fill="#fff"/></svg>')}]);
 });
 it('never fetches arbitrary hosts or redirect targets',async()=>{
  const f=vi.fn().mockResolvedValue(new Response(JSON.stringify([{title:'Evil',route:'https://evil.test/a.svg'},{title:'Evil',route:'https://svgl.app.evil/library/a.svg'},{title:'Evil',route:'http://svgl.app/library/a.svg'}])));

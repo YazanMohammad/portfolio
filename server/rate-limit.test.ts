@@ -89,6 +89,17 @@ it("no statement deletes other hashes' rows except the SKIP LOCKED global prune"
   }
 });
 
+import * as rateLimit from './rate-limit';
+it('svgl reservations use the existing persistent, atomic limiter with a separate bucket',async()=>{
+ const reserveSvglSearch=(rateLimit as unknown as Record<string,typeof reserve>).reserveSvglSearch;
+ expect(reserveSvglSearch).toBeTypeOf('function');sent.length=0;
+ await reserveSvglSearch(HASH,NOW);
+ const queries=sent[0];expect(queries[0].query).toMatch(LOCK);expect(queries[0].params).toEqual(['svgl:'+HASH,'2']);
+ expect(queries[1].query).toBe(HASH_PRUNE);
+ const insert=queries.find(q=>/INSERT INTO login_attempts/.test(q.query))!;
+ expect(insert.query).toContain("interval '1 minute'");expect(insert.query).toContain('SELECT count(*)');expect(insert.query).toContain('RETURNING id');
+ for(const q of queries)expect(q.query).not.toContain(HASH);
+});
 it("no value is spliced into the SQL text", async () => {
   sent.length = 0;
   await reserve(HASH, NOW);

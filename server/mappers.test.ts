@@ -17,6 +17,14 @@ const education: typeof db.education.$inferSelect = { id: 1, degree: "CS", schoo
 const skill: typeof db.skills.$inferSelect = { id: 1, name: "TS", category: "Language", iconSlug: null, iconSvg: null, isVisible: true, sortOrder: 0 };
 const rows = () => ({ profile, projects: [project], experience: [experience], education: [education], skills: [skill] });
 afterEach(() => vi.useRealTimers());
+it('sanitises legacy/direct-SQL skill SVGs on the public read path, dropping invalid icons only',()=>{
+ const content=toPublicContent({...rows(),skills:[
+  {...skill,id:1,iconSvg:'<svg onload="bad()"><path d="M0 0\nL1 1"/></svg>'},
+  {...skill,id:2,iconSvg:'<!DOCTYPE svg><svg/>'},
+ ]});
+ expect(content.skills[0].iconSvg).toBe('<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L1 1"/></svg>');
+ expect(content.skills[1].iconSvg).toBeNull();
+});
 it('ymToDate and dateToYm round-trip "2024-09"', () => {
   expect(ymToDate("2024-09")).toBe("2024-09-01");
   expect(dateToYm(ymToDate("2024-09"))).toBe("2024-09");

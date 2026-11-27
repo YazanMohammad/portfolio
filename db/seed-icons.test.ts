@@ -3,6 +3,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { seedSkills } from './seed-data';
 import fallback from '../src/content/fallback.json';
 import { sanitizeSvg } from '../shared/svg';
+it('uses a light monochrome Linux silhouette on the black background',()=>{
+ const icon=readFileSync('db/seed-icons/linux.svg','utf8');
+ expect(icon).toContain('fill="#f4f4f4"');
+ expect(icon).not.toMatch(/fill="#000(?:000)?"/i);
+});
 it('ships real, sanitised SVG seed files and identical offline public fallback',()=>{
  expect(seedSkills.filter(s=>s.iconSvg)).toHaveLength(18);
  for(const skill of seedSkills) {

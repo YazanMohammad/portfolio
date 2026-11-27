@@ -11,5 +11,5 @@ describe('SVG allow-list', () => {
   expect(svg.sanitizeSvg(valid.replace('<path',`<path ${attack}`))).toBe(valid);
  });
  it.each(['<!DOCTYPE svg [<!ENTITY x "oops">]><svg>&x;</svg>','<html/>','<svg/><svg/>','<svg>','<svg>'+ ' '.repeat(16384)+'</svg>'])('rejects invalid or oversized input', input => expect(()=>svg.sanitizeSvg(input)).toThrow());
- it('keeps local gradient references only',()=>expect(svg.sanitizeSvg('<svg viewBox="0 0 1 1"><path fill="url(#a)" stroke="url(https://evil)"/></svg>')).toBe('<svg viewBox="0 0 1 1"><path fill="url(#a)"/></svg>'));
+ it('keeps local gradient references only',()=>expect(svg.sanitizeSvg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path fill="url(#a)" stroke="url(https://evil)"/></svg>')).toBe('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path fill="url(#a)"/></svg>'));
 });

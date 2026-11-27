@@ -37,6 +37,6 @@ export function SkillIconField({form}:{form:AnyForm}) {
     choose(sanitizeSvg(text));
    }catch(e){setError(e instanceof Error?e.message:'Invalid SVG.');}
    e.target.value='';
-  }}/><p className="text-sm text-muted-foreground">SVG only, up to 16 KB. Icons are cleaned on the server when saved.</p>
+  }}/><p className="text-sm text-muted-foreground">SVG only, up to 16 KB. Icons are cleaned on the server when saved. Styles and classes are removed; use explicit fill and stroke colours.</p>
  </fieldset>;
 }

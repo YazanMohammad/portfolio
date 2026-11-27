@@ -98,7 +98,8 @@
 .site-shell .skills__group h3 { font-size: 14.4px; padding-top: 4px; }
 .site-shell .skills__group ul { display: flex; flex-wrap: wrap; gap: 4px 20px; list-style: none; font-size: 22.5px; }
 .site-shell .skills__group li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-.site-shell .skills__group li img { width: 18px; height: 18px; flex: none; object-fit: contain; }
+.site-shell .skill-icon { width: max(16px, 1em); height: max(16px, 1em); flex: none; object-fit: contain; display: inline-block; vertical-align: -.12em; }
+.site-shell .skills-marquee .skill-icon { margin-inline-end: .35em; }
 .site-shell .about-copy { max-width: 65ch; }
 .site-shell .about-copy p + p { margin-top: 24px; }
 .site-shell .photo-slot img { max-width: 100%; height: auto; margin-top: 32px; }

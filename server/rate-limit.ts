@@ -92,6 +92,31 @@ export async function markLoginSuccess(ipHash: string, attemptId: number, now: D
   ]);
 }
 
+// Admin icon search: 12 requests per IP hash per minute, shared across workers/instances.
+// Reuse the existing event table and advisory-lock pattern, with a namespaced bucket and
+// success=true so icon requests never consume password failures or interfere with login cleanup.
+// Denied searches insert nothing: repeated refusals cannot grow this bucket.
+export async function reserveSvglSearch(ipHash: string, now: Date = new Date()): Promise<
+  { allowed: true } | { allowed: false; retryAfter: number }
+> {
+  const bucket = `svgl:${ipHash}`;
+  const [, , inserted, recent] = await db.batch([
+    db.execute(lockHash(bucket, 2)),
+    pruneOwnLoginAttempts(bucket, now),
+    db.execute(sql`INSERT INTO login_attempts (ip_hash, success, created_at)
+      SELECT ${bucket}::text, true, ${ts(now)}
+      WHERE (SELECT count(*) FROM login_attempts
+        WHERE ip_hash = ${bucket}::text AND created_at > ${ts(now)} - interval '1 minute') < 12
+      RETURNING id`),
+    db.select({ createdAt: loginAttempts.createdAt }).from(loginAttempts)
+      .where(and(eq(loginAttempts.ipHash, bucket), sql`${loginAttempts.createdAt} > ${ts(now)} - interval '1 minute'`))
+      .orderBy(desc(loginAttempts.createdAt)).limit(12),
+    pruneOldLoginAttempts(now),
+  ]);
+  if (inserted.rows.length > 0) return { allowed: true };
+  return { allowed: false, retryAfter: recent.length ? secondsLeft(recent[recent.length - 1].createdAt, 60_000, now) : 1 };
+}
+
 // Inserts the message only if this IP hash sent fewer than 3 in the last hour.
 // The check and the insert are one statement. The advisory lock before it (same transaction)
 // makes concurrent sends from one IP hash wait their turn, so a burst cannot all see count < 3.

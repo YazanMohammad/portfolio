@@ -45,7 +45,10 @@ export function toEducation(row: EducationRow): Education {
 }
 
 export function toSkill(row: SkillRow): Skill {
-  return { id: row.id, name: row.name, category: row.category, iconSlug: row.iconSlug, iconSvg: row.iconSvg ?? null,
+  // Defence in depth for legacy/direct-SQL rows. A corrupt icon must not break /api/content.
+  let iconSvg: string | null = null;
+  try { if (row.iconSvg) iconSvg = sanitizeSvg(row.iconSvg); } catch { /* Name-only fallback. */ }
+  return { id: row.id, name: row.name, category: row.category, iconSlug: row.iconSlug, iconSvg,
     isVisible: row.isVisible, sortOrder: row.sortOrder };
 }
 
