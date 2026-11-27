@@ -72,6 +72,7 @@ describeDb("admin account route (real db)", () => {
   it("username change keeps the password, rotates this session and ends every other one", async () => {
     const other = await loginCookie();
     const before = await stored();
+    const requestStarted = Date.now();
     const response = await put({ currentPassword: TEST_PASSWORD, username: "  New-Name " }, cookie);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ username: "New-Name" });
@@ -79,7 +80,10 @@ describeDb("admin account route (real db)", () => {
     expect(after.username).toBe("New-Name");
     expect(after.passwordHash).toBe(before.passwordHash);
     expect(after.version).toBe(before.version + 1);
-    expect(after.updatedAt.getTime()).toBeGreaterThanOrEqual(before.updatedAt.getTime());
+    // The fixture default is database time; the handler writes application time. Never order
+    // those clocks against each other (the Neon host can be slightly ahead of this machine).
+    expect(after.updatedAt.getTime()).toBeGreaterThanOrEqual(requestStarted);
+    expect(after.updatedAt.getTime()).toBeLessThanOrEqual(Date.now());
     const rotated = cookieOf(response);
     expect(rotated).not.toBe(cookie);
     expect((await getMe(cookie)).status).toBe(401);

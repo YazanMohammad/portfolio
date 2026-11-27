@@ -12,7 +12,7 @@
     "test:api": "vitest run --project node tests/api",
     "test:db": "node tests/api/test-db.mjs",
     "build": "node scripts/sync-security-headers.mjs --check && tsc --noEmit && vite build",
-    "build:vps": "node scripts/generate-vps-functions.mjs && pnpm build && node scripts/build-vps.mjs",
+    "build:vps": "node scripts/generate-vps-functions.mjs --check && pnpm build && node scripts/build-vps.mjs",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

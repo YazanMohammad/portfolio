@@ -2,7 +2,15 @@ import { purgeCache } from "@netlify/functions";
 import { afterEach, expect, it, vi } from "vitest";
 import { publicCacheHeaders, purgeContent } from "./cache";
 vi.mock("@netlify/functions", () => ({ purgeCache: vi.fn().mockResolvedValue(undefined) }));
-afterEach(() => { vi.restoreAllMocks(); vi.clearAllMocks(); });
+afterEach(() => { vi.restoreAllMocks(); vi.clearAllMocks(); vi.unstubAllEnvs(); });
+it("does not call Netlify cache APIs from the standalone runtime", async () => {
+  vi.stubEnv("PORTFOLIO_RUNTIME", "vps");
+  await purgeContent();
+  expect(purgeCache).not.toHaveBeenCalled();
+  const headers = publicCacheHeaders(["content"]);
+  expect(headers.get("Netlify-Cache-Tag")).toBeNull();
+  expect(headers.get("Netlify-CDN-Cache-Control")).toBeNull();
+});
 it("purgeContent passes content and project tags", async () => {
   await purgeContent({ slugs: ["old-slug", "new-slug"] });
   expect(purgeCache).toHaveBeenCalledWith({ tags: ["content", "project:old-slug", "project:new-slug"] });

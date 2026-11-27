@@ -1,0 +1,17 @@
+# Per-app snippet: install as /etc/caddy/sites/portfolio.caddy.
+# DNS must already target this VPS; SITE_ORIGIN is https://www.yznmoh.com.
+www.yznmoh.com {
+    header Strict-Transport-Security "max-age=31536000"
+    header -Server
+    encode zstd gzip
+    # 4 MiB upload + 64 KiB multipart envelope; same as vps/server.ts.
+    request_body {
+        max_size 4259840
+    }
+    reverse_proxy 127.0.0.1:3000
+}
+
+yznmoh.com, 185-189-1-11.sslip.io {
+    header -Server
+    redir https://www.yznmoh.com{uri} 301
+}

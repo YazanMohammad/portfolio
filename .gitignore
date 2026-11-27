@@ -1,5 +1,14 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# VPS runtime releases / atomic activation state
+/releases/
+/current
+/previous
+/.deploy-lock/
+/.current-*
+/.previous-*
+/.rollback-current
+
 # compiled output
 dist-server
 dist

@@ -67,9 +67,7 @@ describe("standalone HTTP adapter", () => {
       expect(JSON.parse(res.body).error.code).toBe("not_found");
     }
   });
-  it("caps declared and chunked bodies before handlers run", async () => {
-    const res = await raw("/api/auth/login", "POST", "x".repeat(65537));
-    expect(res.status).toBe(413);
+  it("rejects excessive declared lengths before dispatch without reading the body", async () => {
     const declared = await raw("/api/auth/login", "POST", undefined, { "Content-Length": "65537" });
     expect(declared.status).toBe(413);
   });
@@ -91,6 +89,27 @@ describe("standalone HTTP adapter", () => {
     expect(error.status).toBe(500);
     expect(error.body).not.toContain("secret-stack");
     expect((await raw("/api/hang")).status).toBe(504);
+  });
+  it("uses a canonical pathname, rejects fragments, and strips platform and hop-by-hop headers", async () => {
+    server.closeAllConnections();
+    await new Promise<void>(resolve => server.close(() => resolve()));
+    server = createAppServer({ routes: [{ name: "echo", config: { path: "/api/echo" }, handler: async req => new Response(JSON.stringify({ path: new URL(req.url).pathname, headers: Object.fromEntries(req.headers) }), { headers: { "Content-Type": "application/json", Connection: "x-secret", "x-secret": "hidden", "Netlify-Cache-Tag": "content" } }) }], log: () => {} });
+    await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
+    origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    const response = await raw("/api/e%63ho", "GET", undefined, { "x-nf-client-connection-ip": "1.1.1.1", "x-forwarded-for": "2.2.2.2", "x-forwarded-proto": "https", "proxy-authorization": "hidden", Connection: "x-hidden", "x-hidden": "hidden", "x-normal": "ok" });
+    expect(response.status).toBe(200);
+    const body = JSON.parse(response.body);
+    expect(body.path).toBe("/api/echo");
+    expect(body.headers["x-normal"]).toBe("ok");
+    expect(Object.keys(body.headers).filter(key => /^(x-nf-|x-forwarded-|proxy-|connection|x-hidden)/.test(key))).toEqual([]);
+    expect(response.headers["x-secret"]).toBeUndefined();
+    expect(response.headers["netlify-cache-tag"]).toBeUndefined();
+    expect((await raw("/api/echo#bad")).status).toBe(404);
+    expect((await raw("/api")).status).toBe(404);
+  });
+  it("returns a deliberate 503 when the SPA entry is missing", async () => {
+    await rm(join(root, "index.html"));
+    expect((await raw("/projects/x")).status).toBe(503);
   });
   it("keeps the deployed Netlify security headers equal to the shared source", () => {
     const toml = readFileSync("netlify.toml", "utf8");

@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { mkdtemp, readdir, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readdir, readFile, rm, stat, symlink, utimes, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { saveFile, getFile, deleteFile } from "./blobs";
+import { initializeFilesDirectory } from "./filesystem";
 
 let root: string;
 beforeEach(async () => {
@@ -12,6 +13,21 @@ beforeEach(async () => {
 afterEach(async () => { vi.unstubAllEnvs(); await rm(root, { recursive: true, force: true }); });
 
 describe("filesystem file store", () => {
+  it("initializes once, sweeps only stale temporary files and fails fast on invalid configuration", async () => {
+    await mkdir(process.env.FILES_DIR!, { recursive: true });
+    const old = join(process.env.FILES_DIR!, `.${"a".repeat(32)}.tmp`);
+    const fresh = join(process.env.FILES_DIR!, `.${"b".repeat(32)}.tmp`);
+    await writeFile(old, "old"); await utimes(old, new Date(0), new Date(0));
+    await writeFile(fresh, "fresh");
+    await initializeFilesDirectory();
+    expect(await readdir(process.env.FILES_DIR!)).toEqual([`.${"b".repeat(32)}.tmp`]);
+    await rm(process.env.FILES_DIR!, { recursive: true });
+    // A read uses the initialized location, not mkdir/chmod on every request.
+    expect(await getFile("c".repeat(32) + ".png")).toBeNull();
+    expect(await readdir(join(root, "private"))).toEqual([]);
+    vi.stubEnv("FILES_DIR", "relative/path");
+    await expect(initializeFilesDirectory()).rejects.toThrow("absolute");
+  });
   it("round-trips only the supplied view bytes with type and size, and deletes", async () => {
     const input = new Uint8Array([99, 1, 2, 3, 88]).subarray(1, 4);
     const saved = await saveFile(input, "png", "image/png");

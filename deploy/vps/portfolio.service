@@ -7,10 +7,10 @@ Wants=network-online.target
 Type=simple
 User=hosting
 Group=hosting
-WorkingDirectory=/home/hosting/portfolio
+WorkingDirectory=/home/hosting/portfolio/current
 EnvironmentFile=/home/hosting/portfolio/.env
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/node dist-server/server.mjs
+ExecStart=/usr/bin/node /home/hosting/portfolio/current/dist-server/server.mjs
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGTERM
@@ -19,8 +19,18 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=read-only
 # ProtectHome=read-only keeps the checkout and .env readable; only data is writable.
-ReadWritePaths=/home/hosting/data
+ReadWritePaths=/home/hosting/data/portfolio
 PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectProc=invisible
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+CapabilityBoundingSet=
 UMask=0077
 
 [Install]
