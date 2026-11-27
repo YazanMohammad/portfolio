@@ -64,6 +64,16 @@ describeDb("OWED-DB admin collections (real DB)", () => {
       expect((await call(handler, { path: `/api/admin/${name}`, method: "POST", origin: "https://foreign.test", json: {} })).status).toBe(403);
     });
   });
+  it("persists a sanitised skill icon and exposes it in public content", async()=>{
+    const iconSvg='<svg viewBox="0 0 1 1"><path fill="#fff"/></svg>';
+    const response=await run('/api/admin/skills','POST',{...inputs.skills,iconSvg:iconSvg.replace('<path','<path onload="bad()"')});
+    expect(response.status).toBe(201); const created=await response.json(); expect(created.iconSvg).toBe(iconSvg);
+    const read=await (await run('/api/admin/skills')).json();
+    expect(read.find((s:{id:number})=>s.id===created.id).iconSvg).toBe(iconSvg);
+    const contentHandler=(await import('../../netlify/functions/content')).default;
+    const publicContent=await (await call(contentHandler,{path:'/api/content'})).json();
+    expect(publicContent.skills.find((s:{id:number})=>s.id===created.id).iconSvg).toBe(iconSvg);
+  });
   it("unknown collection is 404", async () => { expect((await run("/api/admin/widgets")).status).toBe(404); });
   it("experience validation reports bullets.2", async () => { const response = await run("/api/admin/experience", "POST", { ...inputs.experience, bullets: ["a", "b", ""] }); expect((await response.json()).error.fields["bullets.2"]).toBeTruthy(); });
   it("non-project writes purge the plain content tag", async () => { await run("/api/admin/skills", "POST", inputs.skills); expect(purgeSpy).toHaveBeenCalledWith({ tags: ["content"] }); });

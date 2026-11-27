@@ -29,7 +29,8 @@ describe("editorial public site", () => {
   it("typesets skills without icon tiles", () => {
     const {container}=render(<SkillsSection skills={content.skills} />);
     content.skills.forEach(s=>expect(screen.getByText(s.name, { selector: "li" })).toBeInTheDocument());
-    expect(container.querySelector("img, svg")).toBeNull();
+    expect(container.querySelectorAll("li img")).toHaveLength(18);
+    expect(container.querySelector("li svg")).toBeNull();
   });
   it("shows CV employers, dates and bullets, without education metrics", () => {
     render(<TimelineSection experience={content.experience} education={content.education} />);
@@ -45,7 +46,7 @@ describe("editorial public site", () => {
     expect(css).not.toContain("scaleX(.25)");
     expect(css).toContain(":focus-visible::after");
     expect(css).toContain("text-decoration-thickness: 1px");
-    expect(css).toContain(".skills__group li { white-space: nowrap; }");
+    expect(css).toContain(".skills__group li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }");
     expect(css).toContain(".project-margin { grid-column: 1 / 4;");
     expect(css).toContain(".hero__intro { grid-column: 4 / 11;");
     const { container } = render(<WorkSection projects={content.projects.map((p, index) => ({ ...p, id: 99 + index * 3, title: index === 0 ? "Example 1" : p.title }))} />);

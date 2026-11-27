@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+const seedIcon = (slug: string) => readFileSync(new URL(`./seed-icons/${slug}.svg`, import.meta.url), "utf8");
 import { PROFILE_ABOUT, PROFILE_INTRO } from "../src/content/copy";
 import type { EducationInput, ExperienceInput, ProfileInput, ProjectInput, SkillInput } from "../shared/index";
 
@@ -153,6 +155,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Python",
     "category": "Languages",
     "iconSlug": "python",
+    "iconSvg": seedIcon("python"),
     "isVisible": true,
     "sortOrder": 1
   },
@@ -160,6 +163,7 @@ export const seedSkills: SkillInput[] = [
     "name": "C#",
     "category": "Languages",
     "iconSlug": "csharp",
+    "iconSvg": seedIcon("csharp"),
     "isVisible": true,
     "sortOrder": 2
   },
@@ -167,6 +171,7 @@ export const seedSkills: SkillInput[] = [
     "name": "JavaScript",
     "category": "Languages",
     "iconSlug": "javascript",
+    "iconSvg": seedIcon("javascript"),
     "isVisible": true,
     "sortOrder": 3
   },
@@ -174,6 +179,7 @@ export const seedSkills: SkillInput[] = [
     "name": "TypeScript",
     "category": "Languages",
     "iconSlug": "typescript",
+    "iconSvg": seedIcon("typescript"),
     "isVisible": true,
     "sortOrder": 4
   },
@@ -181,6 +187,7 @@ export const seedSkills: SkillInput[] = [
     "name": "SQL",
     "category": "Languages",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 5
   },
@@ -188,6 +195,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Java",
     "category": "Languages",
     "iconSlug": "java",
+    "iconSvg": seedIcon("java"),
     "isVisible": true,
     "sortOrder": 6
   },
@@ -195,6 +203,7 @@ export const seedSkills: SkillInput[] = [
     "name": "LLM-response evaluation",
     "category": "AI Evaluation",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 7
   },
@@ -202,6 +211,7 @@ export const seedSkills: SkillInput[] = [
     "name": "coding and reasoning assessment",
     "category": "AI Evaluation",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 8
   },
@@ -209,6 +219,7 @@ export const seedSkills: SkillInput[] = [
     "name": "instruction-following evaluation",
     "category": "AI Evaluation",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 9
   },
@@ -216,6 +227,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Arabic-language quality review",
     "category": "AI Evaluation",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 10
   },
@@ -223,6 +235,7 @@ export const seedSkills: SkillInput[] = [
     "name": "prompt design",
     "category": "AI Evaluation",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 11
   },
@@ -230,6 +243,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Codex",
     "category": "AI Development Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("codex"),
     "isVisible": true,
     "sortOrder": 12
   },
@@ -237,6 +251,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Claude coding agents",
     "category": "AI Development Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("claude-code"),
     "isVisible": true,
     "sortOrder": 13
   },
@@ -244,6 +259,7 @@ export const seedSkills: SkillInput[] = [
     "name": "MCP tool use for coding",
     "category": "AI Development Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("mcp"),
     "isVisible": true,
     "sortOrder": 14
   },
@@ -251,6 +267,7 @@ export const seedSkills: SkillInput[] = [
     "name": "n8n",
     "category": "AI Development Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("n8n"),
     "isVisible": true,
     "sortOrder": 15
   },
@@ -258,6 +275,7 @@ export const seedSkills: SkillInput[] = [
     "name": "REST/JSON APIs",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 16
   },
@@ -265,6 +283,7 @@ export const seedSkills: SkillInput[] = [
     "name": "API integration",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 17
   },
@@ -272,6 +291,7 @@ export const seedSkills: SkillInput[] = [
     "name": "ASP.NET Core",
     "category": "Backend & APIs",
     "iconSlug": "dotnet",
+    "iconSvg": seedIcon("dotnet"),
     "isVisible": true,
     "sortOrder": 18
   },
@@ -279,6 +299,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Entity Framework Core",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 19
   },
@@ -286,6 +307,7 @@ export const seedSkills: SkillInput[] = [
     "name": "SQL Server",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": seedIcon("sql-server"),
     "isVisible": true,
     "sortOrder": 20
   },
@@ -293,6 +315,7 @@ export const seedSkills: SkillInput[] = [
     "name": "JWT authentication",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 21
   },
@@ -300,6 +323,7 @@ export const seedSkills: SkillInput[] = [
     "name": "input validation",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 22
   },
@@ -307,6 +331,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Swagger",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": seedIcon("swagger"),
     "isVisible": true,
     "sortOrder": 23
   },
@@ -314,6 +339,7 @@ export const seedSkills: SkillInput[] = [
     "name": "SignalR",
     "category": "Backend & APIs",
     "iconSlug": null,
+    "iconSvg": null,
     "isVisible": true,
     "sortOrder": 24
   },
@@ -321,6 +347,7 @@ export const seedSkills: SkillInput[] = [
     "name": "React.js",
     "category": "Frontend & Engineering Tools",
     "iconSlug": "react",
+    "iconSvg": seedIcon("react"),
     "isVisible": true,
     "sortOrder": 25
   },
@@ -328,6 +355,7 @@ export const seedSkills: SkillInput[] = [
     "name": "HTML",
     "category": "Frontend & Engineering Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("html"),
     "isVisible": true,
     "sortOrder": 26
   },
@@ -335,6 +363,7 @@ export const seedSkills: SkillInput[] = [
     "name": "CSS",
     "category": "Frontend & Engineering Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("css"),
     "isVisible": true,
     "sortOrder": 27
   },
@@ -342,6 +371,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Git",
     "category": "Frontend & Engineering Tools",
     "iconSlug": "git",
+    "iconSvg": seedIcon("git"),
     "isVisible": true,
     "sortOrder": 28
   },
@@ -349,6 +379,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Docker",
     "category": "Frontend & Engineering Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("docker"),
     "isVisible": true,
     "sortOrder": 29
   },
@@ -356,6 +387,7 @@ export const seedSkills: SkillInput[] = [
     "name": "Linux",
     "category": "Frontend & Engineering Tools",
     "iconSlug": null,
+    "iconSvg": seedIcon("linux"),
     "isVisible": true,
     "sortOrder": 30
   }

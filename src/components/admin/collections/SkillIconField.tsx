@@ -21,11 +21,11 @@ export function SkillIconField({form}:{form:AnyForm}) {
   catch(e){setError(e instanceof Error?e.message:'Icon search failed.');}
   finally{setBusy(false);}
  }
- return <fieldset className="skill-icon-field"><legend>Skill icon</legend>
+ return <fieldset className="skill-icon-field grid gap-3"><legend>Skill icon</legend>
   {preview && <img src={preview} alt="Current skill icon" width={32} height={32}/>}
   <label htmlFor="skill-icon-search">Find on svgl</label>
   <div className="flex gap-2"><Input id="skill-icon-search" value={search} maxLength={100} onChange={e=>setSearch(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();if(search.trim()&&!busy) void find();}}}/><Button type="button" disabled={busy||!search.trim()} onClick={()=>void find()}>{busy?'Searching…':'Search icons'}</Button></div>
-  <div aria-live="polite">{error && <p role="alert">{error}</p>}{results.map((icon,i)=><Button key={`${icon.title}-${i}`} type="button" variant="outline" aria-label={`Choose ${icon.title}`} onClick={()=>choose(icon.iconSvg)}><img src={icon.preview} alt="" width={24} height={24}/>{icon.title}</Button>)}</div>
+  <div className="flex flex-wrap gap-2" aria-live="polite">{error && <p role="alert">{error}</p>}{results.map((icon,i)=><Button key={`${icon.title}-${i}`} type="button" variant="outline" aria-label={`Choose ${icon.title}`} onClick={()=>choose(icon.iconSvg)}><img src={icon.preview} alt="" width={24} height={24}/>{icon.title}</Button>)}</div>
   <Button type="button" variant="outline" onClick={()=>choose(null)}>Remove icon</Button>
   <label htmlFor="skill-icon-upload">Upload SVG</label><Input id="skill-icon-upload" type="file" accept="image/svg+xml,.svg" onChange={async e=>{
    const file=e.target.files?.[0];if(!file)return;
