@@ -65,12 +65,11 @@
 .site-shell .skills__group h3 { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
 .site-shell .skills-list .skills__group ul { display: block; font-size: 18px; }
 .site-shell .skills__group li { line-height: 1.65; white-space: normal; align-items: baseline; }
-.site-shell .skills-marquee { overflow: hidden; margin: 8px 0 40px; border-block: 1px solid var(--line); padding-block: 18px; font: 400 clamp(26px,3.3vw,48px)/1.2 var(--font-mono); }
+.site-shell .skills-marquee { overflow: hidden; margin: 8px 0 32px; border-block: 1px solid var(--line); padding-block: 12px; font: 400 clamp(18px,2.2vw,32px)/1.2 var(--font-mono); }
 .site-shell .skills-marquee__track { display: flex; width: max-content; animation: skills-run 80s linear infinite; }
 .site-shell .skills-marquee__copy { display: flex; flex-shrink: 0; }
 .site-shell .skills-marquee__copy > span { white-space: nowrap; }
 .site-shell .skills-marquee i { color: var(--accent); font-style: normal; padding-inline: .5em; }
-.site-shell .skills-band:is(:hover,:focus-within) .skills-marquee__track { animation-play-state: paused; }
 .site-shell[data-motion="paused"] .skills-marquee__track { animation-play-state: paused; }
 .site-shell .nav__pause { font: 400 12px/1 var(--font-mono); color: var(--ink); background: none; border: 1px solid var(--line); padding: 10px 12px; min-height: 44px; cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }
 @media (prefers-reduced-motion: reduce) { .site-shell .nav__pause { display: none; } }
